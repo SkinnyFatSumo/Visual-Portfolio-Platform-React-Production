@@ -46,11 +46,11 @@ export const tagStringFromURL = path => {
 };
 
 export const validOwner = props => {
-  var valid_owner = false;
-  props.user !== null &&
-  props.user.username === props.match.params.username &&
-  props.isAuthenticated
-    ? (valid_owner = true)
-    : null;
-  return valid_owner;
+  if (
+    props.user !== null &&
+    props.user.username === props.match.params.username &&
+    props.isAuthenticated
+  )
+    return true;
+  else return false;
 };

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ButtonGroup, Form, Collapse, Col} from 'react-bootstrap';
+import {Button, Form, Collapse, Col} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -27,10 +27,9 @@ class FindTagByName extends Component {
     this.setState({[e.target.name]: e.target.value});
   }
 
-  clearState(e) {
+  clearState = (e) => {
     e.preventDefault();
     this.setState({tagname: ''});
-    this.props.closeAll;
   }
 
   render() {

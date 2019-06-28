@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import {Button, Form, Collapse, Col} from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
@@ -7,9 +7,6 @@ import {connect} from 'react-redux';
 
 // Actions
 import {rudPhoto, postPhoto} from '../../actions/photoActions';
-
-// Helpers
-import {validOwner} from '../support/helpers';
 
 class CreateOrEditPhoto extends Component {
   constructor(props) {
@@ -63,23 +60,19 @@ class CreateOrEditPhoto extends Component {
 
   onSubmit(e) {
     e.preventDefault();
-    const {postPhoto, user, action} = this.props;
-    console.log('ACTION TYPE', this.props.action);
+    const {postPhoto, user, action, rudPhoto} = this.props;
     const photo = {
       title: this.state.title,
       photo_source: this.state.photo_source,
       thumbnail_source: this.state.thumbnail_source,
       thumbnail_width: this.state.thumbnail_width,
       thumbnail_height: this.state.thumbnail_height,
-      owner: this.props.user.id,
+      owner: user.id,
     };
     if (action === 'create') {
-      this.props.postPhoto(photo);
+      postPhoto(photo);
     } else if (action === 'edit') {
-      this.props.rudPhoto(this.state.id, 'PUT', photo);
-      console.log('submit update');
-    } else if (action === 'info') {
-      console.log('info');
+      rudPhoto(this.state.id, 'PUT', photo);
     }
   }
 
@@ -90,7 +83,6 @@ class CreateOrEditPhoto extends Component {
       thumbnail_source,
       thumbnail_width,
       thumbnail_height,
-      id
     } = this.state;
     const {action, toggleOpen, isOpen, disabled} = this.props;
     var openName;

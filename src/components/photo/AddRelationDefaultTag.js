@@ -42,7 +42,7 @@ class AddRelationDefaultTag extends Component {
     e.preventDefault();
     const relation = {
       tag: this.props.tag_id,
-      photo: parseInt(event.target.id),
+      photo: parseInt(e.target.id),
       owner: this.props.user.id,
       tagname: this.props.tagname,
     };
@@ -51,13 +51,13 @@ class AddRelationDefaultTag extends Component {
   };
 
   launchDetailView = e => {
-    event.preventDefault();
+    e.preventDefault();
     //  PUSH TO GALLERY VIEW
     this.props.history.push(
       '/user/' +
         this.props.match.params.username +
         '/detail/' +
-        event.target.id,
+        e.target.id,
     );
   };
 

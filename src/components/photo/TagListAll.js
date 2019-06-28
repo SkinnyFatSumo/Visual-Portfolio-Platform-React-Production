@@ -76,7 +76,6 @@ class TagListAll extends Component {
       searchTagActive: false,
       activeTag: event.target.name,
     });
-    console.log('set tag pressed was:', event.target.name);
   };
 
   setActiveTagFromState = tagname => {
@@ -85,18 +84,15 @@ class TagListAll extends Component {
       searchTagActive: false,
       activeTag: tagname,
     });
-    console.log('set tag pressed was:', tagname);
   };
 
   unsetActiveTag = event => {
     event.preventDefault();
     this.setState({activeTag: null});
-    console.log('unset tag pressed was:', event.target.name);
   };
 
   destroyTag = event => {
     event.preventDefault();
-    console.log('destroyTag called');
     this.props.rudTag(
       event.target.id,
       'DELETE',
@@ -106,18 +102,15 @@ class TagListAll extends Component {
 
   // RESTRUCTURE DATA FOR DISTRIBUTING PHOTOS BASED ON TAGS
   assignData = () => {
-    console.log('assign data called');
     // CREATE OBJECT TO STORE PHOTOS, USING THEIR IDS AS KEYS
     var photos_object = {};
     this.props.all_photos.forEach(photo => {
-      console.log('FOR EACH ALL PHOTO', this.props.all_photos);
       photos_object[photo.id] = photo;
     });
 
     // GROUP RELATIONS (original format is 1:1, photo to tag) BY TAG
     const grouped_by_tag = groupByProperty(this.props.relations, 'tag');
 
-    console.log('GROUPED BY TAG', grouped_by_tag);
     // STORE TAGNAME AND ITS PHOTOS TO ARRAY OF TAGS
     // STORE THE ACTUAL PHOTO OBJECTS TO THE ARRAY INSTEAD OF THEIR IDS
     var tag_array_with_photos = [];
@@ -156,14 +149,11 @@ class TagListAll extends Component {
       });
     }
 
-    console.log('Tag Array NONE, before', tag_array_no_photos);
-
     // CREATE A LIST OF UNUSED TAGS (THOSE WITH NO PHOTOS ASSOCIATED)
     for (let i = 0; i < tag_array_with_photos.length; i++) {
       tag_array_no_photos = tag_array_no_photos.filter(
         all_tags => all_tags.tagname !== tag_array_with_photos[i].tagname,
       );
-      console.log('t_a_n_p', tag_array_no_photos);
     }
 
     // SORT TAG ARRAY BY TAGNAME (ALPHABETICALLY)
@@ -178,9 +168,6 @@ class TagListAll extends Component {
       }
       return 0;
     });
-
-    console.log('Tag Array WITH', tag_array_with_photos);
-    console.log('Tag Array NONE, after', tag_array_no_photos);
 
     // CONVERT TO JSX LISTS
     const per_tag_with_photos = tag_array_with_photos.map(tag => (
@@ -245,7 +232,7 @@ class TagListAll extends Component {
   };
 
   render() {
-    if (this.props.all_tags_loaded && this.props.all_tags.length > 0) {
+    if (this.props.all_tags_loaded && this.props.all_tags.length > 0 || validOwner(this.props)) {
       return (
         <div className="centering-container">
           <div id="tag-view-content-container" className="content-container">

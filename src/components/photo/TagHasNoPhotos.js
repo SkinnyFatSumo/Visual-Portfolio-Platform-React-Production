@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 
 import {withRouter} from 'react-router-dom';
 
@@ -6,7 +6,7 @@ import {withRouter} from 'react-router-dom';
 import AddRelationDefaultTag from './AddRelationDefaultTag';
 
 // Bootstrap Components
-import {Button, ButtonToolbar, Container} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 
 class TagHasNoPhotos extends Component {
   constructor(props) {

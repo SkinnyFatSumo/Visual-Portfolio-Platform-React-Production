@@ -1,23 +1,11 @@
 // React
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 
 // Redux
 import {connect} from 'react-redux';
 
 // React Router
-import {Router, withRouter, Redirect, Link} from 'react-router-dom';
-
-import {
-  InputGroup,
-  FormControl,
-  Button,
-  Form,
-  Collapse,
-  Col,
-  Row,
-  Container,
-  Nav,
-} from 'react-bootstrap';
+import {withRouter} from 'react-router-dom';
 
 // import {fetchAllUsers} from '../../actions/userActions';
 import PropTypes from 'prop-types';
@@ -45,7 +33,6 @@ class SearchUsers extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('PATHNAME', this.props.history.location.pathname);
     const {username, isActive} = this.state;
     const {source, allUsersLoaded, users} = this.props;
     if (source === 'navbar') {
@@ -60,11 +47,8 @@ class SearchUsers extends Component {
     }
 
     if (
-      this.props.allUsersLoaded &&
-      this.state.username !== prevState.username
+      allUsersLoaded && username !== prevState.username
     ) {
-      console.log('state username', username);
-
       var user_lower = username.toLowerCase();
       var resulting_users = users.map(user => user.username.toLowerCase());
 
@@ -128,8 +112,6 @@ class SearchUsers extends Component {
         value={username}
       />
     ));
-
-    const {pathname} = this.props.history.location.pathname;
 
     return (
       <form

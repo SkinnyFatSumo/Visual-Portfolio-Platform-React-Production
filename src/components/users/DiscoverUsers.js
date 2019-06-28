@@ -1,5 +1,5 @@
 // React
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 
 // Redux
 import {connect} from 'react-redux';
@@ -8,8 +8,6 @@ import {connect} from 'react-redux';
 import {withRouter, Link} from 'react-router-dom';
 
 import SearchUsers from './SearchUsers';
-
-import {Button, Form, Collapse, Col} from 'react-bootstrap';
 
 // import {fetchAllUsers} from '../../actions/userActions';
 import PropTypes from 'prop-types';

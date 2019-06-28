@@ -40,12 +40,12 @@ class DeleteRelationDefaultTag extends Component {
     e.preventDefault();
   };
 
-  deleteRelation = event => {
-    event.preventDefault();
+  deleteRelation = e => {
+    e.preventDefault();
     console.log('Tag ID', this.props.tag_id);
     var relation = this.props.relations.find(
       relation =>
-        relation.photo == event.target.id &&
+        relation.photo == e.target.id &&
         relation.tag == this.props.tag_id,
     );
     console.log('relation', relation);
@@ -53,13 +53,13 @@ class DeleteRelationDefaultTag extends Component {
   };
 
   launchDetailView = e => {
-    event.preventDefault();
+    e.preventDefault();
     //  PUSH TO GALLERY VIEW
     this.props.history.push(
       '/user/' +
         this.props.match.params.username +
         '/detail/' +
-        event.target.id,
+        e.target.id,
     );
   };
 

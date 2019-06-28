@@ -75,6 +75,7 @@ class PhotoGallery extends Component {
     );
   };
 
+  /*
   mapTagButtons = (tags, photo_id, destroyRelation) => {
     console.log('tag_id', tag_id);
     var titles_list = photos.map(photo =>
@@ -105,6 +106,7 @@ class PhotoGallery extends Component {
     );
     return titles_list;
   };
+  */
 
   componentDidUpdate(prevProps) {
     const {photos} = this.props;
@@ -120,9 +122,11 @@ class PhotoGallery extends Component {
   render() {
     const {index, direction, isOpen, tagActive, photoActive} = this.state;
     var action, disabled;
-    validOwner(this.props)
-      ? (action = 'edit')
-      : ((action = 'info'), (disabled = 'disabled'));
+    if (validOwner(this.props)) action = 'edit';
+    else {
+      action = 'info';
+      disabled = 'disabled';
+    }
     console.log('INDEX', index);
     console.log('iasdf', this.props.photos[index]);
     if (this.props.photos[index] !== undefined) {
@@ -188,7 +192,9 @@ class PhotoGallery extends Component {
       return (
         <div className="centering-container">
           <div className="general-outer-container">
-            <h5 id="no-content">Either this user has no photos, or they failed to load.</h5>
+            <h5 id="no-content">
+              Either this user has no photos, or they failed to load.
+            </h5>
           </div>
         </div>
       );

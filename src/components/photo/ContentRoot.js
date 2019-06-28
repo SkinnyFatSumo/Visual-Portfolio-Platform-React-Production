@@ -1,5 +1,5 @@
 // React
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 
 // React Router
 import {withRouter} from 'react-router-dom';
@@ -15,9 +15,6 @@ import {fetchRelations, fetchTags, setTags} from '../../actions/tagActions';
 import CreateOrEditPhoto from './CreateOrEditPhoto';
 import DisplayButtons from './DisplayButtons';
 import TagSelectBox from './TagSelectBox';
-
-// Other Components
-import DiscoverUsers from '../users/DiscoverUsers';
 
 // Helpers
 import {stringOfTags, validOwner} from '../support/helpers';
@@ -118,16 +115,13 @@ class ContentRoot extends Component {
   componentDidUpdate(prevProps) {
     // STORE ALL VARIABLES NEEDED FROM URL PARAMS AND PROPS
     const {username, display, urltags} = this.props.match.params;
-    const {activeDisplay, viewed_user} = this.state;
+    const {activeDisplay} = this.state;
     const {
       all_photos_loaded,
       all_photos_loading,
       allUsersLoaded,
-      history,
       photos_loaded,
       photos_loading,
-      photos,
-      relations,
       relations_loaded,
       relations_loading,
       setPhotos,
@@ -135,7 +129,6 @@ class ContentRoot extends Component {
       tags,
       tags_loaded,
       tags_loading,
-      users,
     } = this.props;
 
     // INSURE DISPLAY TYPE IS VALID - SET STATE OR REDIRECT
@@ -253,7 +246,7 @@ class ContentRoot extends Component {
     // STORE DISPLAY TYPE, BECAUSE WE WILL ONLY SHOW TAG SELECT BOX FOR
     // GRID AND GALLERY VIEWS
     const {display} = this.props.match.params;
-    const {createOrEditPhotoActive, isOpen} = this.state;
+    const {createOrEditPhotoActive, isOpen, viewTagsActive} = this.state;
     const {
       all_photos,
       all_photos_loaded,
@@ -299,16 +292,16 @@ class ContentRoot extends Component {
           <div className="toolbar-container">
             <ButtonToolbar className="tags-and-photo-toolbar">
               <TagSelectBox
-                photos={this.props.photos}
-                relations={this.props.relations}
-                tags={this.props.tags}
+                photos={photos}
+                relations={relations}
+                tags={tags}
                 onTagClick={this.handleTagClick}
-                isOpen={this.state.viewTagsActive}
+                isOpen={viewTagsActive}
                 toggleOpen={this.handlePhotoVsTags}
               />
               {validOwner(this.props) ? (
                 <CreateOrEditPhoto
-                  isOpen={this.state.createOrEditPhotoActive}
+                  isOpen={createOrEditPhotoActive}
                   toggleOpen={this.handlePhotoVsTags}
                   action="create"
                 />

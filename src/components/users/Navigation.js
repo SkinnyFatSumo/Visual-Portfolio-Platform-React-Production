@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Nav, Navbar, Collapse} from 'react-bootstrap';
+import {Nav, Navbar} from 'react-bootstrap';
 
 // Router
 import {matchPath} from 'react-router';
@@ -15,7 +15,6 @@ import SearchUsers from '../users/SearchUsers';
 import {logoutUser} from '../../actions/authActions';
 
 // Helpers
-import {validOwner} from '../support/helpers';
 import PropTypes from 'prop-types';
 
 class Navigation extends Component {
@@ -29,7 +28,6 @@ class Navigation extends Component {
 
   handleChange = e => {
     e.preventDefault();
-    console.log('EVENT TARGET VALUE:', e.target.value);
     var redirect = e.target.value;
     this.setState({menu_value: 'account'});
     if (redirect === 'login') {
@@ -42,7 +40,6 @@ class Navigation extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    console.log('NAVIGATION UPDATE', this.props.match.params.username);
     // IF USERNAME IN ROUTER CHANGES, FORCE THE COMPONENT TO UPDATE
   }
 
@@ -50,10 +47,6 @@ class Navigation extends Component {
     const match = matchPath(this.props.history.location.pathname, {
       path: '/user/:username',
     });
-
-    const {history} = this.props.history;
-
-    console.log('Username?', match);
 
     return (
       <Navbar expand="sm" id="navbar">

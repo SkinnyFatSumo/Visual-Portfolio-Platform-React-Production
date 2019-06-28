@@ -33,7 +33,6 @@ class TagHasPhotos extends Component {
     this.state = {isActive: false, buttonClass: 'button-inactive'};
 
     this.launchDetailView = this.launchDetailView.bind(this);
-    this.toggleActive = this.toggleActive.bind(this);
   }
 
   launchDetailView = event => {
@@ -45,14 +44,6 @@ class TagHasPhotos extends Component {
         '/detail/' +
         event.target.id,
     );
-  };
-
-  toggleActive = event => {
-    console.log('toggling active');
-    event.preventDefault();
-    this.props.activeTag === event.target.name
-      ? this.props.unsetActiveTag
-      : this.props.setActiveTag;
   };
 
   render() {
