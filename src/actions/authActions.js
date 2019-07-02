@@ -9,11 +9,13 @@ import {
   LOGOUT,
 } from './types';
 
+import api_root from './apiRoot';
+
 // CHECK TOKEN AND LOAD USER
 
 export const logoutUser = () => (dispatch, getState) => {
   const token = getState().auth.token;
-  const auth_endpoint = 'http://localhost:8000/api/auth/logout';
+  const auth_endpoint = api_root + 'api/auth/logout';
   const auth_lookupOptions = {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
@@ -45,7 +47,7 @@ export const authenticateUser = () => (dispatch, getState) => {
   
 
   const token = getState().auth.token;
-  const auth_endpoint = 'http://localhost:8000/api/auth/user';
+  const auth_endpoint = api_root + 'api/auth/user';
   const auth_lookupOptions = {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
@@ -85,7 +87,7 @@ export const loginUser = userData => dispatch => {
     body: JSON.stringify(userData),
   };
 
-  const login_endpoint = 'http://localhost:8000/api/auth/login';
+  const login_endpoint = api_root + 'api/auth/login';
 
   fetch(login_endpoint, login_lookupOptions)
     .then(response => {
@@ -121,7 +123,7 @@ export const registerUser = userData => dispatch => {
     body: JSON.stringify(userData),
   };
 
-  const register_endpoint = 'http://localhost:8000/api/auth/register';
+  const register_endpoint = api_root + 'api/auth/register';
 
   fetch(register_endpoint, register_lookupOptions)
     .then(response => {
