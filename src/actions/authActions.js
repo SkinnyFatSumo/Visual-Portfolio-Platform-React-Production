@@ -10,6 +10,7 @@ import {
 } from './types';
 
 import api_root from './apiRoot';
+console.log('api_root: ', api_root);
 
 // CHECK TOKEN AND LOAD USER
 
