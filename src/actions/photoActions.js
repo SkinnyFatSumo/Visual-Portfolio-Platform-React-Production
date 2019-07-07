@@ -11,6 +11,8 @@ import {
   ALL_PHOTOS_FAILURE,
 } from './types';
 
+import {api_root} from './apiRoot';
+
 // Retrieve, Update, Destroy
 export const rudPhoto = (id, method, data) => (dispatch, getState) => {
   dispatch({type: RUD_PHOTO_LOADING});
@@ -24,7 +26,7 @@ export const rudPhoto = (id, method, data) => (dispatch, getState) => {
     },
   };
 
-  const rud_endpoint = 'http://localhost:8000/api/photos/' + id;
+  const rud_endpoint = api_root + 'api/photos/' + id;
 
   const token = getState().auth.token;
   if (token) {
@@ -63,9 +65,9 @@ export const setPhotos = (username, tag_string) => dispatch => {
   var tagged_endpoint;
   tag_string == ''
     ? (tagged_endpoint =
-        'http://localhost:8000/api/photos/' + username + '/list')
+        api_root + 'api/photos/' + username + '/list')
     : (tagged_endpoint =
-        'http://localhost:8000/api/photos/' +
+        api_root + 'api/photos/' +
         username +
         '/sort?tags=' +
         tag_string);
@@ -95,7 +97,7 @@ export const fetchAllPhotos = username => dispatch => {
     headers: {'Content-Type': 'application/json'},
   };
   const tagged_endpoint =
-    'http://localhost:8000/api/photos/' + username + '/list';
+    api_root + 'api/photos/' + username + '/list';
 
   fetch(tagged_endpoint, tagged_lookupOptions)
     .then(res => {
@@ -135,7 +137,7 @@ export const postPhoto = photoData => (dispatch, getState) => {
   }
   // TODO: else, dispatch an error
 
-  const post_endpoint = 'http://localhost:8000/api/photos/create';
+  const post_endpoint = api_root + 'api/photos/create';
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {

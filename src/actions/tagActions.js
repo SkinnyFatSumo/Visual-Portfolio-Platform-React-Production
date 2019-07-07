@@ -27,8 +27,7 @@ import {
   SET_TAGS,
 } from './types';
 
-// TODO: create CREATE/UPDATE/DESTROY_RELATIONS
-// TODO: create CREATE/UPDATE/DESTROY_TAGS
+import {api_root} from './apiRoot';
 
 //---------------------------------------------------------------------------//
 //                          ASYNCHRONOUS CALLS                                //
@@ -43,7 +42,7 @@ export const fetchTags = username => dispatch => {
     headers: {'Content-Type': 'application/json'},
   };
   const get_endpoint =
-    'http://localhost:8000/api/photos/tags/' + username + '/list';
+    api_root + 'api/photos/tags/' + username + '/list';
   fetch(get_endpoint, get_lookupOptions)
     .then(res => res.json())
     .then(tags => {
@@ -91,7 +90,7 @@ export const postRelation = relationData => (dispatch, getState) => {
   }
   // TODO: else, dispatch an error
 
-  const post_endpoint = 'http://localhost:8000/api/photos/pwt/create';
+  const post_endpoint = api_root + 'api/photos/pwt/create';
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {
@@ -134,7 +133,7 @@ export const postTag = tagData => (dispatch, getState) => {
   }
   // TODO: else, dispatch an error
 
-  const post_endpoint = 'http://localhost:8000/api/photos/tags/create';
+  const post_endpoint = api_root + 'api/photos/tags/create';
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {
@@ -167,7 +166,7 @@ export const fetchRelations = username => dispatch => {
     headers: {'Content-Type': 'application/json'},
   };
   const get_endpoint =
-    'http://localhost:8000/api/photos/pwt/' + username + '/list';
+    api_root + 'api/photos/pwt/' + username + '/list';
 
   fetch(get_endpoint, get_lookupOptions)
     .then(res => res.json())
@@ -194,7 +193,7 @@ export const rudRelation = (id, method, data) => (dispatch, getState) => {
   };
 
   const rud_endpoint =
-    'http://localhost:8000/api/photos/pwt/rud/' + id.toString();
+    api_root + 'api/photos/pwt/rud/' + id.toString();
 
   const token = getState().auth.token;
   if (token) {
@@ -231,7 +230,7 @@ export const rudTag = (id, method, username, tags, data) => (dispatch, getState)
   };
 
   const rud_endpoint =
-    'http://localhost:8000/api/photos/tags/rud/' + username + '/' + id;
+    api_root + 'api/photos/tags/rud/' + username + '/' + id;
 
   const token = getState().auth.token;
   if (token) {
