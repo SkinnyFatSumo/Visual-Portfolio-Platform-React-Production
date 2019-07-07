@@ -12,6 +12,9 @@ import {
   VIEWING_USER_FAILURE,
 } from './types';
 
+
+import {api_root} from './apiRoot';
+
 export const viewingUser = (username, bool) => {
   if (bool) {
     return {
@@ -30,7 +33,7 @@ export const fetchAllUsers = () => dispatch => {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
   };
-  const allUsers_endpoint = 'http://localhost:8000/api/auth/users';
+  const allUsers_endpoint = api_root + 'api/auth/users';
   dispatch({
     type: ALL_USERS_LOADING,
   });
