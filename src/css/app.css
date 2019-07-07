@@ -170,7 +170,8 @@
   border-color: rgba(52, 52, 52, 1) !important;
   width: 33px;
   height: 30px;
-  margin-top: 8px;
+  margin-top: 9px;
+  padding-bottom: 1px;
 }
 
 #search-users-input-button-navbar:hover {
@@ -217,6 +218,7 @@
   border-radius: 0px 2px 2px 0px;
   border-color: rgba(52, 52, 52, 1);
   min-width: 10%;
+  padding-bottom: 1px;
 }
 
 #register-login-button {
