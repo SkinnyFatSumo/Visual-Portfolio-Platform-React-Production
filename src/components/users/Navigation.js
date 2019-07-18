@@ -34,6 +34,7 @@ class Navigation extends Component {
       this.props.history.push('/login/');
     } else if (redirect === 'logout') {
       this.props.logoutUser();
+      this.props.history.push('/login/');
     } else if (redirect === 'profile') {
       this.props.history.push('/user/' + this.props.user.username + '/grid/');
     }
