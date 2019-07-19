@@ -14,7 +14,7 @@ import {
 import {api_root} from './apiRoot';
 
 // Retrieve, Update, Destroy
-export const rudPhoto = (id, method, data) => (dispatch, getState) => {
+export const rudPhoto = (id, method, photoData) => (dispatch, getState) => {
   dispatch({type: RUD_PHOTO_LOADING});
 
   console.log('RUD PHOTO CALLED');
@@ -22,7 +22,7 @@ export const rudPhoto = (id, method, data) => (dispatch, getState) => {
   const rud_lookupOptions = {
     method: method,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data',
     },
   };
 
@@ -32,8 +32,8 @@ export const rudPhoto = (id, method, data) => (dispatch, getState) => {
   if (token) {
     rud_lookupOptions.headers['Authorization'] = `Token ${token}`;
   }
-  if (data) {
-    rud_lookupOptions.body = JSON.stringify(data);
+  if (photoData) {
+    rud_lookupOptions.body = photoData;
   }
   // TODO: else, dispatch an error
   // TODO: catch status code, return alert based on success or failure / type
@@ -125,10 +125,11 @@ export const fetchAllPhotos = username => dispatch => {
 // POST / CREATE PHOTO
 export const postPhoto = photoData => (dispatch, getState) => {
   console.log('POST PHOTO CALLED');
+  console.log('photoData:', photoData);
   const post_lookupOptions = {
     method: 'POST',
-    body: JSON.stringify(photoData),
-    headers: {'Content-Type': 'application/json'},
+    body: photoData,
+    headers: {},
   };
 
   const token = getState().auth.token;
