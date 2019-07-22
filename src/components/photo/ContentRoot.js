@@ -188,6 +188,8 @@ class ContentRoot extends Component {
         this.setState({createOrEditPhotoActive: false});
       }
       this.setState({viewTagsActive: !this.state.viewTagsActive});
+    } else {
+      this.setState({viewTagsActive: false, createOrEditPhotoActive: false});
     }
   };
 

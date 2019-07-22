@@ -30,24 +30,6 @@ class AddRelationDefaultTag extends Component {
     this.filterOutput = this.filterOutput.bind(this);
   }
   
-  componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside);
-  }
-  
-  componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
-  }
-  
-  setWrapperRef = node => {
-    this.wrapperRef = node;
-  }
-
-  handleClickOutside = e => {
-    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
-      this.props.toggleOpen(e);
-    }
-  }
-
 
   onChange = e => {
     this.setState({[e.target.name]: e.target.value});

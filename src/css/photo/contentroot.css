@@ -8,6 +8,17 @@
   max-width: 1200px;
 }
 
+
+
+@media only screen and (max-width: 450px) {
+  .carousel {
+    margin: 5px;
+  }
+  #carousel-caption {
+   opacity: 0
+ } 
+}
+
 .carousel-item {
   text-align: center;
   max-height: 700px;
@@ -308,6 +319,11 @@
 .toolbar-container {
   display: inline-block;
   text-align: center;
+}
+
+@media only screen and (max-width: 300px) {
+  .display-options-toolbar .btn {
+  }
 }
 
 .display-options-toolbar {

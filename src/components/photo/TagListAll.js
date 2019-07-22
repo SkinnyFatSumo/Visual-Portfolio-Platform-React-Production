@@ -44,7 +44,7 @@ class TagListAll extends Component {
 
   componentDidMount() {
     console.log('STATE', this.props.location.state);
-    document.addEventListener('mousedown', this.handleClickOutside);
+    // document.addEventListener('mousedown', this.handleClickOutside);
     if (
       this.props.location.state !== undefined &&
       this.props.location.state.target_tag !== undefined &&
@@ -56,6 +56,7 @@ class TagListAll extends Component {
     }
   }
 
+  /*
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside);
   }
@@ -73,6 +74,7 @@ class TagListAll extends Component {
       this.unsetActiveTag(e);
     }
   };
+  */
 
   handleAddVsSearch = event => {
     if (event.target.id === 'search-tag-toggle-button') {
@@ -238,7 +240,7 @@ class TagListAll extends Component {
               ? 'Tags With Associated Photos'
               : 'All Tags'}
           </h4>
-          <div ref={this.setWrapperRef} id="tags-with-photos-body" className="body">
+          <div id="tags-with-photos-body" className="body">
             {per_tag_with_photos}
           </div>
         </div>

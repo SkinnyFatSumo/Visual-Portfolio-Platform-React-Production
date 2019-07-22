@@ -21,6 +21,9 @@ class TagHasNoPhotos extends Component {
   };
 
   render() {
+
+    var isOpen = this.props.activeTag === this.props.tagname;
+    
     if (
       this.props.user !== null &&
       this.props.user.username === this.props.match.params.username &&
@@ -28,10 +31,18 @@ class TagHasNoPhotos extends Component {
     ) {
       return (
         <div className="tag-content-container">
-          <button onClick={this.toggleActive} className="tagname-button">
+          <button
+            className="tagname-button"
+            id={this.props.tagname + '-dropdown'}
+            name={this.props.tagname}
+            onClick={
+              this.props.activeTag === this.props.tagname
+                ? this.props.unsetActiveTag
+                : this.props.setActiveTag
+            }>
             {this.props.tagname}
           </button>
-          {this.state.isActive ? (
+          {isOpen ? (
             <div className="general-outer-container">
               <AddRelationDefaultTag
                 tagname={this.props.tagname}

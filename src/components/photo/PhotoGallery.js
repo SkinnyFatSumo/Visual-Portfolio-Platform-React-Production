@@ -101,8 +101,12 @@ class PhotoGallery extends Component {
       action = 'info';
       disabled = 'disabled';
     }
-    console.log('INDEX', index);
-    console.log('iasdf', this.props.photos[index]);
+
+    var width = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0,
+    );
+
     if (this.props.photos[index] !== undefined) {
       return (
         <div className="centering-container">
@@ -113,7 +117,7 @@ class PhotoGallery extends Component {
                 direction={direction}
                 onSelect={this.handleSelect}
                 controls={true}
-                indicators={true}
+                indicators={width > 450 ? true : false}
                 interval={null}>
                 {this.props.photos.map(photo => (
                   <Carousel.Item key={photo.id}>

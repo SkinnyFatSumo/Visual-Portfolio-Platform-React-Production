@@ -13,24 +13,29 @@ class TagSelectBox extends Component {
       isOpen: false,
     };
   }
-  
+
   componentDidMount() {
     document.addEventListener('mousedown', this.handleClickOutside);
   }
-  
+
   componentWillUnmount() {
     document.removeEventListener('mousedown', this.handleClickOutside);
   }
-  
+
   setWrapperRef = node => {
     this.wrapperRef = node;
-  }
+  };
 
   handleClickOutside = e => {
-    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+    if (
+      this.wrapperRef &&
+      !this.wrapperRef.contains(e.target) &&
+      e.target.id !== 'add-photo-toggle-button'
+    ) {
       this.props.toggleOpen(e);
     }
-  }
+  };
+
   render() {
     // CONTROL TOGGLE STATE OF THE TAG BOX
     const {isOpen} = this.state;
@@ -86,7 +91,7 @@ class TagSelectBox extends Component {
     // onClick={() => this.setState({isOpen: !isOpen})}
 
     return (
-      <div className="collapse-tags-all">
+      <div ref={this.setWrapperRef} className="collapse-tags-all">
         <Button
           id="tag-select-box-button"
           onClick={this.props.toggleOpen}
@@ -97,20 +102,26 @@ class TagSelectBox extends Component {
         <Collapse in={this.props.isOpen}>
           <div className="absolute-collapse-box">
             <div className="tag-select-container">
-              <div className="collapse-tags-box" id="collapse-tags-active">
-                <h6 className="tag-select-header">Active</h6>
-                <ButtonToolbar className="tag-filter-toolbar" id="active-tags">
-                  {active}
-                </ButtonToolbar>
-              </div>
-              <div className="collapse-tags-box" id="collapse-tags-inactive">
-                <h6 className="tag-select-header">Inactive</h6>
-                <ButtonToolbar
-                  className="tag-filter-toolbar"
-                  id="inactive-tags">
-                  {inactive}
-                </ButtonToolbar>
-              </div>
+              {active.length === 0 ? null : (
+                <div className="collapse-tags-box" id="collapse-tags-active">
+                  <h6 className="tag-select-header">Active</h6>
+                  <ButtonToolbar
+                    className="tag-filter-toolbar"
+                    id="active-tags">
+                    {active}
+                  </ButtonToolbar>
+                </div>
+              )}
+              {inactive.length === 0 ? null : (
+                <div className="collapse-tags-box" id="collapse-tags-inactive">
+                  <h6 className="tag-select-header">Inactive</h6>
+                  <ButtonToolbar
+                    className="tag-filter-toolbar"
+                    id="inactive-tags">
+                    {inactive}
+                  </ButtonToolbar>
+                </div>
+              )}
             </div>
           </div>
         </Collapse>
