@@ -44,6 +44,7 @@ class TagListAll extends Component {
 
   componentDidMount() {
     console.log('STATE', this.props.location.state);
+    document.addEventListener('mousedown', this.handleClickOutside);
     if (
       this.props.location.state !== undefined &&
       this.props.location.state.target_tag !== undefined &&
@@ -54,6 +55,24 @@ class TagListAll extends Component {
       this.setActiveTagFromState(this.props.location.state.target_tag);
     }
   }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (
+      this.wrapperRef &&
+      !this.wrapperRef.contains(e.target) &&
+      e.target.className !== 'tagname-button' 
+    ) {
+      this.unsetActiveTag(e);
+    }
+  };
 
   handleAddVsSearch = event => {
     if (event.target.id === 'search-tag-toggle-button') {
@@ -66,6 +85,8 @@ class TagListAll extends Component {
         this.setState({searchTagActive: false});
       }
       this.setState({addTagActive: !this.state.addTagActive});
+    } else {
+      this.setState({addTagActive: false, searchTagActive: false});
     }
   };
 
@@ -104,6 +125,7 @@ class TagListAll extends Component {
   assignData = () => {
     // CREATE OBJECT TO STORE PHOTOS, USING THEIR IDS AS KEYS
     var photos_object = {};
+    console.log('all_photos', this.props.all_photos);
     this.props.all_photos.forEach(photo => {
       photos_object[photo.id] = photo;
     });
@@ -129,17 +151,21 @@ class TagListAll extends Component {
       });
 
       // SORT PHOTOS UNDER TAG BY TITLE NAME (ALPHABETICAL)
-      related_photos.sort((a, b) => {
-        var title_a = a.photo_info.title.toLowerCase();
-        var title_b = b.photo_info.title.toLowerCase();
-        if (title_a < title_b) {
-          return -1;
-        }
-        if (title_a > title_b) {
-          return 1;
-        }
-        return 0;
-      });
+      if (related_photos.length > 1) {
+        related_photos.sort((a, b) => {
+          console.log('photo object', photos_object);
+          console.log('heyo', a, b);
+          var title_a = a.photo_info.title.toLowerCase();
+          var title_b = b.photo_info.title.toLowerCase();
+          if (title_a < title_b) {
+            return -1;
+          }
+          if (title_a > title_b) {
+            return 1;
+          }
+          return 0;
+        });
+      }
 
       // APPEND VALUES TO TAG ARRAY
       tag_array_with_photos.push({
@@ -212,7 +238,7 @@ class TagListAll extends Component {
               ? 'Tags With Associated Photos'
               : 'All Tags'}
           </h4>
-          <div id="tags-with-photos-body" className="body">
+          <div ref={this.setWrapperRef} id="tags-with-photos-body" className="body">
             {per_tag_with_photos}
           </div>
         </div>
@@ -232,7 +258,12 @@ class TagListAll extends Component {
   };
 
   render() {
-    if (this.props.all_tags_loaded && this.props.all_tags.length > 0 || validOwner(this.props)) {
+    if (
+      this.props.all_photos_loaded &&
+      this.props.all_photos.length > 0 &&
+      this.props.all_tags_loaded &&
+      (this.props.all_tags.length > 0 || validOwner(this.props))
+    ) {
       return (
         <div className="centering-container">
           <div id="tag-view-content-container" className="content-container">
@@ -263,7 +294,9 @@ class TagListAll extends Component {
       return (
         <div className="centering-container">
           <div className="general-outer-container">
-            <h5 id="no-content">Either this user has no tags, or they failed to load.</h5>
+            <h5 id="no-content">
+              Either this user has no tags, or they failed to load.
+            </h5>
           </div>
         </div>
       );

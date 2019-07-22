@@ -5,13 +5,14 @@ import {connect} from 'react-redux';
 
 // React Components
 import AddRelationDefaultPhoto from './AddRelationDefaultPhoto';
-import Carousel from 'react-bootstrap/Carousel';
-import {Button, ButtonGroup, ButtonToolbar, Collapse} from 'react-bootstrap';
+import DeleteButton from './DeleteButton';
 import CreateOrEditPhoto from './CreateOrEditPhoto';
 
+import Carousel from 'react-bootstrap/Carousel';
+import {Button, ButtonGroup, ButtonToolbar, Collapse} from 'react-bootstrap';
+
 // Actions
-import {rudPhoto} from '../../actions/photoActions';
-// Helpers
+import {rudPhoto} from '../../actions/photoActions'; // Helpers
 import PropTypes from 'prop-types';
 import {validOwner} from '../support/helpers';
 // CSS
@@ -26,9 +27,10 @@ class PhotoGallery extends Component {
     this.state = {
       tagActive: false,
       photoActive: false,
-      index: 0,
+      index: parseInt(localStorage.getItem('gallery_index'), 10),
       direction: null,
       mapping: null,
+      confirm: false,
     };
 
     this.handleSelect = this.handleSelect.bind(this);
@@ -43,11 +45,13 @@ class PhotoGallery extends Component {
 
   handleSelect = (selectedIndex, e) => {
     console.log('index from handle', this.state.index);
+    console.log('selectedIndex', selectedIndex);
     console.log('photos', this.props.photos);
     this.setState({
       index: selectedIndex,
       direction: e.direction,
     });
+    localStorage.setItem('gallery_index', parseInt(selectedIndex, 10));
   };
 
   handlePhotoVsTag = event => {
@@ -61,6 +65,8 @@ class PhotoGallery extends Component {
         this.setState({photoActive: false});
       }
       this.setState({tagActive: !this.state.tagActive});
+    } else {
+      this.setState({tagActive: false, photoActive: false});
     }
   };
 
@@ -75,46 +81,14 @@ class PhotoGallery extends Component {
     );
   };
 
-  /*
-  mapTagButtons = (tags, photo_id, destroyRelation) => {
-    console.log('tag_id', tag_id);
-    var titles_list = photos.map(photo =>
-      this.props.user !== null &&
-      this.props.user.username === this.props.match.params.username &&
-      this.props.isAuthenticated ? (
-        <ButtonGroup className="photo-button-group" key={photo.id}>
-          <Button
-            className="photo-button-name"
-            id={photo.id}
-            onClick={this.launchDetailView}>
-            {photo.title}
-          </Button>
-          <Button
-            className="remove-button"
-            data-photo_id={photo.id}
-            data-tag_id={tag_id}
-            onClick={destroyRelation}
-          />
-        </ButtonGroup>
-      ) : (
-        <ButtonGroup className="photo-button-group">
-          <Button key={photo.id} id={photo.id} onClick={this.launchDetailView}>
-            {photo.title}
-          </Button>
-        </ButtonGroup>
-      ),
-    );
-    return titles_list;
+  toggleConfirm = () => {
+    this.setState({confirm: !this.state.confirm});
   };
-  */
 
   componentDidUpdate(prevProps) {
     const {photos} = this.props;
     const {index} = this.state;
-    if (
-      photos.length !== prevProps.photos.length &&
-      photos[index] === undefined
-    ) {
+    if (photos[index] === undefined && index !== 0) {
       this.setState({index: 0});
     }
   }

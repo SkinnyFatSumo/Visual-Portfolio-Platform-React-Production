@@ -106,6 +106,7 @@ class ContentRoot extends Component {
 
     this.validateDisplay(display, activeDisplay);
     if (allUsersLoaded) this.initializeUserContent();
+    localStorage.setItem('gallery_index', 0);
   }
 
   // ------------------
@@ -120,6 +121,7 @@ class ContentRoot extends Component {
       all_photos_loaded,
       all_photos_loading,
       allUsersLoaded,
+      photos,
       photos_loaded,
       photos_loading,
       relations_loaded,
@@ -133,6 +135,10 @@ class ContentRoot extends Component {
 
     // INSURE DISPLAY TYPE IS VALID - SET STATE OR REDIRECT
     this.validateDisplay(display, activeDisplay);
+
+    if (display !== 'gallery' && photos.length !== prevProps.photos.length) {
+      localStorage.setItem('gallery_index', 0);
+    }
 
     // INSURE INITIAL LOADING OF USER BEFORE MORE SPECIFIC CHECKS
     if (allUsersLoaded) {

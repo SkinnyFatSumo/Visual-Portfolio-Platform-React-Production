@@ -13,35 +13,31 @@ class TagSelectBox extends Component {
       isOpen: false,
     };
   }
+  
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+  
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+  
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  }
+
+  handleClickOutside = e => {
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.props.toggleOpen(e);
+    }
+  }
   render() {
     // CONTROL TOGGLE STATE OF THE TAG BOX
     const {isOpen} = this.state;
 
     // CREATE LISTS TO STORE ACTIVE VS. INACTIVE TAG BUTTONS
-    var active = [
-      /*
-      <Button
-        key="inactive"
-        className="filter-title"
-        id="active-title"
-        variant="dark"
-        size="sm">
-        ACTIVE: &nbsp; &nbsp;
-      </Button>,
-      */
-    ];
-    var inactive = [
-      /*
-      <Button
-        key="active"
-        className="filter-title"
-        id="inactive-title"
-        variant="secondary"
-        size="sm">
-        INACTIVE:
-      </Button>,
-      */
-    ];
+    var active = [];
+    var inactive = [];
 
     // STORE IDS OF ALL CURRENT PHOTOS BEING DISPLAYED
     const photo_ids = this.props.photos.map(photo => photo.id);

@@ -98,7 +98,7 @@ class Register extends Component {
                   name="username"
                   value={username}
                   onChange={this.handleChange}
-                  placeholder="Enter Username"
+                  placeholder="username"
                 />
               </Form.Group>
               <Form.Group controlId="formGroupEmail">
@@ -108,7 +108,7 @@ class Register extends Component {
                   type="email"
                   name="email"
                   value={email}
-                  placeholder="Enter Email"
+                  placeholder="email"
                   onChange={this.handleChange}
                 />
                 <Form.Text className="text-muted">
@@ -123,7 +123,7 @@ class Register extends Component {
                   name="password"
                   value={password}
                   type="password"
-                  placeholder="Password"
+                  placeholder="password"
                   onChange={this.handleChange}
                 />
                 <Form.Control
@@ -131,7 +131,7 @@ class Register extends Component {
                   name="password_2"
                   value={password_2}
                   type="password"
-                  placeholder="Confirm Password"
+                  placeholder="confirm password"
                   onChange={this.handleChange}
                 />
               </Form.Group>

@@ -14,7 +14,7 @@ import {authenticateUser} from '../actions/authActions';
 import {fetchAllUsers} from '../actions/userActions';
 
 // React Alerts
-import {Provider as AlertProvider} from 'react-alert';
+import {transitions, positions, Provider as AlertProvider} from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
 
 // COMPONENTS //
@@ -44,6 +44,12 @@ import '../css/app.css';
 // Track and control browser history
 const history = createBrowserHistory();
 
+// Alert Options
+const alertOptions = {
+  timeout: 3000,
+  position: 'top center',
+};
+
 // Root App for building out components (keep index.js pure)
 class App extends Component {
   constructor(props) {
@@ -56,42 +62,42 @@ class App extends Component {
     store.dispatch(fetchAllUsers());
   }
 
-  /*
-  <AlertProvider template={AlertTemplate} {...alertOptions}>
-  </AlertProvider>
-  */
-
   render() {
     return (
       <div id="body">
         <Provider store={store}>
-          <Router history={history}>
+          <AlertProvider template={AlertTemplate} {...alertOptions}>
             <div>
-              <Route path="/" component={Navigation} />
-              <Route exact path="/" component={Login} />
-              <Route path="/register/" component={Register} />
-              <Route path="/login/" component={Login} />
-              <Route
-                path="/user/:username/:display/:urltags?"
-                component={ContentRoot}
-              />
-              <Route path="/user/:username/profile/" component={Profile} />
-              <Route
-                path="/user/:username/gallery/:urltags?"
-                component={PhotoGallery}
-              />
-              <Route
-                path="/user/:username/grid/:urltags?"
-                component={PhotoGrid}
-              />
-              <Route path="/user/:username/tags/" component={TagListAll} />
-              <Route
-                path="/user/:username/detail/:id"
-                component={PhotoDetail}
-              />
-              <Route path="/bad-url/:reason?" component={DiscoverUsers} />
+              <Alerts />
+              <Router history={history}>
+                <div>
+                  <Route path="/" component={Navigation} />
+                  <Route exact path="/" component={Login} />
+                  <Route path="/register/" component={Register} />
+                  <Route path="/login/" component={Login} />
+                  <Route
+                    path="/user/:username/:display/:urltags?"
+                    component={ContentRoot}
+                  />
+                  <Route path="/user/:username/profile/" component={Profile} />
+                  <Route
+                    path="/user/:username/gallery/:urltags?"
+                    component={PhotoGallery}
+                  />
+                  <Route
+                    path="/user/:username/grid/:urltags?"
+                    component={PhotoGrid}
+                  />
+                  <Route path="/user/:username/tags/" component={TagListAll} />
+                  <Route
+                    path="/user/:username/detail/:id"
+                    component={PhotoDetail}
+                  />
+                  <Route path="/bad-url/:reason?" component={DiscoverUsers} />
+                </div>
+              </Router>
             </div>
-          </Router>
+          </AlertProvider>
         </Provider>
       </div>
     );
@@ -99,4 +105,3 @@ class App extends Component {
 }
 
 export default App;
-

@@ -2,6 +2,7 @@ import {
   AUTHENTICATION_LOADING,
   AUTHENTICATION_SUCCESS,
   AUTHENTICATION_FAILURE,
+  GET_ERRORS,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
   REGISTER_SUCCESS,
@@ -39,13 +40,19 @@ export const logoutUser = () => (dispatch, getState) => {
       }),
     )
     .catch(error => {
-      console.log(error);
+      const errors = {
+        message: error.response.data,
+        status: error.response.status,
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: errors,
+      });
     });
 };
 
 export const authenticateUser = () => (dispatch, getState) => {
   dispatch({type: AUTHENTICATION_LOADING});
-  
 
   const token = getState().auth.token;
   const auth_endpoint = api_root + 'api/auth/user';
@@ -81,7 +88,6 @@ export const authenticateUser = () => (dispatch, getState) => {
 };
 
 export const loginUser = userData => dispatch => {
- 
   const login_lookupOptions = {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -93,7 +99,10 @@ export const loginUser = userData => dispatch => {
   fetch(login_endpoint, login_lookupOptions)
     .then(response => {
       if (!response.ok) {
-        throw Error(response.statusText);
+        if (response.status == 400) {
+          throw Error('Invalid login credentials');
+        }
+        throw Error('Unknown error');
       }
       return response;
     })
@@ -106,7 +115,11 @@ export const loginUser = userData => dispatch => {
       });
     })
     .catch(error => {
-      console.log(error);
+      console.log('The error is: ', error);
+      dispatch({
+        type: GET_ERRORS,
+        payload: error,
+      });
       dispatch({
         type: LOGIN_FAILURE,
       });
@@ -114,7 +127,6 @@ export const loginUser = userData => dispatch => {
 };
 
 export const registerUser = userData => dispatch => {
-
   userData.username = userData.username.toLowerCase();
 
   console.log('stringified', JSON.stringify(userData));

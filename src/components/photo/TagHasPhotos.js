@@ -35,6 +35,7 @@ class TagHasPhotos extends Component {
     this.launchDetailView = this.launchDetailView.bind(this);
   }
 
+
   launchDetailView = event => {
     event.preventDefault();
     //  PUSH TO GALLERY VIEW
@@ -73,6 +74,7 @@ class TagHasPhotos extends Component {
     });
 
     const photos_length = this.props.photos.length;
+    var isOpen = this.props.activeTag === this.props.tagname;
 
     return (
       <div>
@@ -87,7 +89,7 @@ class TagHasPhotos extends Component {
           }>
           {this.props.tagname}
         </button>
-        {this.props.activeTag === this.props.tagname ? (
+        {isOpen ? (
           <div className="tag-content-container">
             <div className="general-outer-container">
               <DeleteRelationDefaultTag

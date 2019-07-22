@@ -47,30 +47,6 @@ class PhotoGrid extends Component {
     }
     return columns;
   };
-  /*
-  columns = containerwidth => {
-    let columns = 1;
-    let num_photos = this.props.photos.length;
-    if (num_photos === 1) columns = 1;
-    else if (num_photos === 2) {
-      if (containerwidth >= 400) columns = 2;
-    } else if (num_photos === 3) {
-      if (containerwidth >= 400) columns = 2;
-      if (containerwidth >= 600) columns = 3;
-    } else if (num_photos === 4) {
-      if (containerwidth >= 400) columns = 2;
-      if (containerwidth >= 600) columns = 3;
-      if (containerwidth >= 800) columns = 4;
-    } else {
-      if (containerwidth >= 400) columns = 2;
-      if (containerwidth >= 600) columns = 3;
-      if (containerwidth >= 800) columns = 4;
-      if (containerwidth >= 1200) columns = 5;
-    }
-
-    return columns;
-  };
-  */
 
   handleClick = (event, object) => {
     event.preventDefault();

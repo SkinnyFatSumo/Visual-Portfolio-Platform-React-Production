@@ -53,13 +53,13 @@ class Login extends Component {
               <Form.Group controlId="formGroupEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
-                  autoComplete="off"
                   className="form-element-box"
-                  type="email"
                   name="email"
-                  value={email}
-                  placeholder="Enter Email"
                   onChange={this.handleChange}
+                  placeholder="email"
+                  required
+                  type="email"
+                  value={email}
                 />
               </Form.Group>
               <Form.Group controlId="formGroupPassword">
@@ -67,10 +67,11 @@ class Login extends Component {
                 <Form.Control
                   className="form-element-box"
                   name="password"
-                  value={password}
-                  type="password"
-                  placeholder="Password"
                   onChange={this.handleChange}
+                  placeholder="password"
+                  required
+                  type="password"
+                  value={password}
                 />
               </Form.Group>
               <Button

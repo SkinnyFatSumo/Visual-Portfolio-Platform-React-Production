@@ -19,6 +19,14 @@ class AddTag extends Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
   onChange(e) {
     this.setState({[e.target.name]: e.target.value});
   }
@@ -29,15 +37,29 @@ class AddTag extends Component {
       tagname: this.state.tagname,
       owner: this.props.user.id,
     };
-
     this.props.postTag(tag);
+    this.setState({tagname: ''});
   }
+
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (
+      this.wrapperRef &&
+      !this.wrapperRef.contains(e.target) &&
+      e.target.id !== 'search-tag-toggle-button'
+    ) {
+      this.props.toggleOpen(e);
+    }
+  };
 
   render() {
     const {isOpen, toggleOpen} = this.props;
-    const {title} = this.state;
+    const {tagname} = this.state;
     return (
-      <div className="tag-add-box">
+      <div ref={this.setWrapperRef} className="tag-add-box">
         <Button
           id="add-tag-toggle-button"
           onClick={toggleOpen}
@@ -47,7 +69,10 @@ class AddTag extends Component {
         </Button>
         <Collapse in={isOpen}>
           <div className="absolute-collapse-box">
-            <Form className="photo-or-tag-add-form" id="add-tag" onSubmit={this.onSubmit}>
+            <Form
+              className="photo-or-tag-add-form"
+              id="add-tag"
+              onSubmit={this.onSubmit}>
               <Form.Control
                 autoComplete="off"
                 type="text"
@@ -55,7 +80,7 @@ class AddTag extends Component {
                 placeholder="sample tag"
                 onChange={this.onChange}
                 required
-                value={title}
+                value={tagname}
               />
               <Button type="submit" block>
                 Create Tag

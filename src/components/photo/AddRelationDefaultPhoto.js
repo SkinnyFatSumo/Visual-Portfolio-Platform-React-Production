@@ -34,6 +34,28 @@ class AddRelationDefaultPhoto extends Component {
     this.filterOutput = this.filterOutput.bind(this);
   }
 
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (
+      this.wrapperRef &&
+      !this.wrapperRef.contains(e.target) &&
+      e.target.id !== 'edit-photo-toggle-button'
+    ) {
+      this.props.toggleOpen(e);
+    }
+  };
+
   onChange(e) {
     this.setState({[e.target.name]: e.target.value});
   }
@@ -53,9 +75,11 @@ class AddRelationDefaultPhoto extends Component {
         return 0;
       })
       .map(remaining_tag => (
-
         <ButtonGroup key={remaining_tag.id} className="photo-button-group">
-          <Button id={remaining_tag.id} name={remaining_tag.tagname} onClick={this.launchTagView}>
+          <Button
+            id={remaining_tag.id}
+            name={remaining_tag.tagname}
+            onClick={this.launchTagView}>
             {remaining_tag.tagname.toUpperCase()}
           </Button>
           <Button
@@ -146,7 +170,7 @@ class AddRelationDefaultPhoto extends Component {
     );
 
     return (
-      <div className="relations-box">
+      <div ref={this.setWrapperRef} className="relations-box">
         <Button
           id="edit-tag-toggle-button"
           onClick={toggleOpen}
@@ -157,39 +181,55 @@ class AddRelationDefaultPhoto extends Component {
         <Collapse in={isOpen}>
           <div className="absolute-collapse-box">
             <Form className="photo-or-tag-add-form">
-              <Form.Row>
-                <Form.Group as={Col}>
-                  <Form.Control
-                    autoComplete="off"
-                    type="text"
-                    name="add_tagname"
-                    placeholder="find tag to add"
-                    onChange={this.onChange}
-                    required
-                    value={add_tagname}
-                  />
-                </Form.Group>
-              </Form.Row>
-              <Form.Row id="add-tag-row">
-                {this.filterOutput(unrelated_tag_buttons)}
-              </Form.Row>
-              <hr id="edit-tags-horizontal-rule" />
-              <Form.Row>
-                <Form.Group as={Col}>
-                  <Form.Control
-                    autoComplete="off"
-                    type="text"
-                    name="del_tagname"
-                    placeholder="find tag to remove"
-                    onChange={this.onChange}
-                    required
-                    value={del_tagname}
-                  />
-                </Form.Group>
-              </Form.Row>
-              <Form.Row id="delete-tag-row">
-                {this.filterOutput(related_tag_buttons)}
-              </Form.Row>
+              {all_tags.length === 0 ? (
+                <Form.Row>
+                  <h5>User has no tags</h5>
+                </Form.Row>
+              ) : (
+                <div>
+                  {unrelated_tags.length > 0 ? (
+                    <div>
+                      <Form.Row>
+                        <Form.Group as={Col}>
+                          <Form.Control
+                            autoComplete="off"
+                            type="text"
+                            name="add_tagname"
+                            placeholder="find tag to add"
+                            onChange={this.onChange}
+                            required
+                            value={add_tagname}
+                          />
+                        </Form.Group>
+                      </Form.Row>
+                      <Form.Row id="add-tag-row">
+                        {this.filterOutput(unrelated_tag_buttons)}
+                      </Form.Row>
+                    </div>
+                  ) : null}
+                  {related_tags.length > 0 ? (
+                    <div>
+                      <hr id="edit-tags-horizontal-rule" />
+                      <Form.Row>
+                        <Form.Group as={Col}>
+                          <Form.Control
+                            autoComplete="off"
+                            type="text"
+                            name="del_tagname"
+                            placeholder="find tag to remove"
+                            onChange={this.onChange}
+                            required
+                            value={del_tagname}
+                          />
+                        </Form.Group>
+                      </Form.Row>
+                      <Form.Row id="delete-tag-row">
+                        {this.filterOutput(related_tag_buttons)}
+                      </Form.Row>
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </Form>
           </div>
         </Collapse>
