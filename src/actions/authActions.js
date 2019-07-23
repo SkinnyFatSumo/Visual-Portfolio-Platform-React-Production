@@ -41,8 +41,7 @@ export const logoutUser = () => (dispatch, getState) => {
     )
     .catch(error => {
       const errors = {
-        message: error.response.data,
-        status: error.response.status,
+        message: error,
       };
       dispatch({
         type: GET_ERRORS,
@@ -98,32 +97,43 @@ export const loginUser = userData => dispatch => {
 
   fetch(login_endpoint, login_lookupOptions)
     .then(response => {
-      if (!response.ok) {
-        if (response.status == 400) {
-          throw Error('Invalid login credentials');
-        }
-        throw Error('Unknown error');
+      if (response.ok) {
+        response.json().then(response =>
+          dispatch({
+            type: LOGIN_SUCCESS,
+            payload: response,
+          }),
+        );
+      } else {
+        response.json().then(errors => {
+          console.log('LOGIN ERRORS', errors);
+          dispatch({
+            type: LOGIN_FAILURE,
+          });
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          });
+        });
       }
-      return response;
-    })
-    .then(response => response.json())
-    .then(response => {
-      console.log('response', response);
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: response,
-      });
     })
     .catch(error => {
-      console.log('The error is: ', error);
-      dispatch({
-        type: GET_ERRORS,
-        payload: error,
-      });
       dispatch({
         type: LOGIN_FAILURE,
       });
     });
+};
+
+export const passwordsMatch = (p1, p2) => dispatch => {
+  if (p1 !== p2) {
+    const errors = {password: ['Passwords do not match.']};
+    dispatch({
+      type: GET_ERRORS,
+      payload: errors,
+    });
+    return false;
+  }
+  return true;
 };
 
 export const registerUser = userData => dispatch => {
@@ -140,21 +150,28 @@ export const registerUser = userData => dispatch => {
 
   fetch(register_endpoint, register_lookupOptions)
     .then(response => {
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.ok) {
+        response.json().then(response =>
+          dispatch({
+            type: REGISTER_SUCCESS,
+            payload: response,
+          }),
+        );
+      } else {
+        response.json().then(errors => {
+          console.log('Errors:', errors);
+          dispatch({
+            type: REGISTER_FAILURE,
+          });
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          });
+        });
       }
-      return response;
-    })
-    .then(response => response.json())
-    .then(response => {
-      console.log('response', response);
-      dispatch({
-        type: REGISTER_SUCCESS,
-        payload: response,
-      });
     })
     .catch(error => {
-      console.log(error);
+      console.log('Network Failure', error);
       dispatch({
         type: REGISTER_FAILURE,
       });

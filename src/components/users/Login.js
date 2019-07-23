@@ -48,36 +48,27 @@ class Login extends Component {
       <div className="centering-container">
         <div className="login-or-register-container">
           <div className="general-outer-container" id="account">
-            <h4>Login</h4>
+            <h4 style={{marginTop: '5px'}}>Login</h4>
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formGroupEmail">
-                <Form.Label>Email</Form.Label>
                 <Form.Control
                   className="form-element-box"
                   name="email"
                   onChange={this.handleChange}
                   placeholder="email"
-                  required
-                  type="email"
                   value={email}
                 />
-              </Form.Group>
-              <Form.Group controlId="formGroupPassword">
-                <Form.Label>Password</Form.Label>
                 <Form.Control
+                  style={{marginTop: '5px'}}
                   className="form-element-box"
                   name="password"
                   onChange={this.handleChange}
                   placeholder="password"
-                  required
                   type="password"
                   value={password}
                 />
               </Form.Group>
-              <Button
-                id="register-login-button"
-                name="submit"
-                type="submit">
+              <Button id="register-login-button" name="submit" type="submit">
                 Submit
               </Button>
             </Form>

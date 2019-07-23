@@ -9,6 +9,7 @@ import {fetchRelations, setTags, fetchTags} from '../../actions/tagActions';
 
 // React Components
 import Gallery from 'react-photo-gallery';
+import Loading from '../support/Loading';
 
 // Helpers
 import PropTypes from 'prop-types';
@@ -63,37 +64,39 @@ class PhotoGrid extends Component {
   render() {
     const {photos_loaded, tags_loaded, photos} = this.props;
 
-    if (photos_loaded && tags_loaded && photos.length > 0) {
-      const photo_list = photos.map(photo => ({
-        src: photo.thumbnail_source,
-        width: photo.thumbnail_width,
-        height: photo.thumbnail_height,
-        key: photo.id,
-      }));
-      const photos_length = photos.length;
+    if (photos_loaded && tags_loaded) {
+      if (photos.length === 0) {
+        return (
+          <div className="centering-container">
+            <div className="general-outer-container">
+              <h5 id="no-content">Sorry, this user has no photos.</h5>
+            </div>
+          </div>
+        );
+      } else {
+        const photo_list = photos.map(photo => ({
+          src: photo.thumbnail_source,
+          width: photo.thumbnail_width,
+          height: photo.thumbnail_height,
+          key: photo.id,
+        }));
+        const photos_length = photos.length;
 
-      return (
-        <div id="grid-border">
-          <div id="grid-container">
-            <Gallery
-              photos={photo_list}
-              direction={photos_length <= 6 ? 'row' : 'column'}
-              columns={this.columns}
-              onClick={this.handleClick}
-            />
+        return (
+          <div id="grid-border">
+            <div id="grid-container">
+              <Gallery
+                photos={photo_list}
+                direction={photos_length <= 6 ? 'row' : 'column'}
+                columns={this.columns}
+                onClick={this.handleClick}
+              />
+            </div>
           </div>
-        </div>
-      );
+        );
+      }
     } else {
-      return (
-        <div className="centering-container">
-          <div className="general-outer-container">
-            <h5 id="no-content">
-              Either this user has no photos, or they failed to load.
-            </h5>
-          </div>
-        </div>
-      );
+      return <Loading />;
     }
   }
 }

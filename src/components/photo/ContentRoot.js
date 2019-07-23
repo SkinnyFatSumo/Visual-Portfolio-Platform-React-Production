@@ -266,8 +266,8 @@ class ContentRoot extends Component {
     } = this.props;
 
     // ONLY ACTIVATE NAVIGATION BUTTONS IF PHOTOS ARE LOADED
-    var active;
-    photos_loaded ? (active = true) : (active = false);
+    var active = true;
+    // photos_loaded ? (active = true) : (active = false);
 
     return (
       <div id="main-toolbars-container">

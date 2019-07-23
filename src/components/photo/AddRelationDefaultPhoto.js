@@ -25,6 +25,7 @@ class AddRelationDefaultPhoto extends Component {
     this.state = {
       add_tagname: '',
       del_tagname: '',
+      isOpen: false,
     };
 
     this.onChange = this.onChange.bind(this);
@@ -47,12 +48,8 @@ class AddRelationDefaultPhoto extends Component {
   };
 
   handleClickOutside = e => {
-    if (
-      this.wrapperRef &&
-      !this.wrapperRef.contains(e.target) &&
-      e.target.id !== 'edit-photo-toggle-button'
-    ) {
-      this.props.toggleOpen(e);
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.setState({isOpen: false});
     }
   };
 
@@ -103,8 +100,6 @@ class AddRelationDefaultPhoto extends Component {
       owner: this.props.user.id,
       tagname: this.props.tagname,
     };
-    console.log('relation', relation);
-    console.log('json relation', JSON.stringify(relation));
     this.props.postRelation(relation);
     this.setState({add_tagname: ''});
   }
@@ -112,18 +107,18 @@ class AddRelationDefaultPhoto extends Component {
   delRelation(e) {
     e.preventDefault();
     this.props.rudRelation(e.target.id, 'DELETE', 'destroy');
-    console.log('DELETE RELATION:', e.target.id);
   }
 
   launchTagView(e) {
     e.preventDefault();
     const tagname = e.target.name;
-    console.log('Tagname from launch', tagname);
     this.props.history.push(
       '/user/' + this.props.match.params.username + '/tags#' + e.target.name,
       {target_tag: tagname},
     );
   }
+
+  toggleOpen = () => {this.setState({isOpen: !this.state.isOpen});}
 
   filterOutput(tag_buttons) {
     if (tag_buttons.length > 0) {
@@ -134,8 +129,8 @@ class AddRelationDefaultPhoto extends Component {
   }
 
   render() {
-    const {relations, all_tags, photo_id, isOpen, toggleOpen} = this.props;
-    const {add_tagname, del_tagname} = this.state;
+    const {relations, all_tags, photo_id} = this.props;
+    const {add_tagname, del_tagname, isOpen} = this.state;
 
     const pre_related_tags = relations.filter(
       relation => relation.photo === photo_id,
@@ -173,7 +168,7 @@ class AddRelationDefaultPhoto extends Component {
       <div ref={this.setWrapperRef} className="relations-box">
         <Button
           id="edit-tag-toggle-button"
-          onClick={toggleOpen}
+          onClick={this.toggleOpen}
           aria-controls="collapse-photo-box"
           aria-expanded={isOpen}>
           {isOpen ? 'Finish' : 'Edit Tags'}
@@ -192,10 +187,11 @@ class AddRelationDefaultPhoto extends Component {
                       <Form.Row>
                         <Form.Group as={Col}>
                           <Form.Control
+                            className='search-box'
                             autoComplete="off"
                             type="text"
                             name="add_tagname"
-                            placeholder="find tag to add"
+                            placeholder="add"
                             onChange={this.onChange}
                             required
                             value={add_tagname}
@@ -213,10 +209,11 @@ class AddRelationDefaultPhoto extends Component {
                       <Form.Row>
                         <Form.Group as={Col}>
                           <Form.Control
+                            className='search-box'
                             autoComplete="off"
                             type="text"
                             name="del_tagname"
-                            placeholder="find tag to remove"
+                            placeholder="remove"
                             onChange={this.onChange}
                             required
                             value={del_tagname}

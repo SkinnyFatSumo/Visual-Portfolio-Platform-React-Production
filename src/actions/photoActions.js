@@ -1,4 +1,5 @@
 import {
+  GET_ERRORS,
   NEW_PHOTO_SUCCESS,
   PHOTOS_SUCCESS,
   PHOTOS_LOADING,
@@ -64,13 +65,9 @@ export const setPhotos = (username, tag_string) => dispatch => {
   };
   var tagged_endpoint;
   tag_string == ''
-    ? (tagged_endpoint =
-        api_root + 'api/photos/' + username + '/list')
+    ? (tagged_endpoint = api_root + 'api/photos/' + username + '/list')
     : (tagged_endpoint =
-        api_root + 'api/photos/' +
-        username +
-        '/sort?tags=' +
-        tag_string);
+        api_root + 'api/photos/' + username + '/sort?tags=' + tag_string);
 
   fetch(tagged_endpoint, tagged_lookupOptions)
     .then(res => res.json())
@@ -96,8 +93,7 @@ export const fetchAllPhotos = username => dispatch => {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
   };
-  const tagged_endpoint =
-    api_root + 'api/photos/' + username + '/list';
+  const tagged_endpoint = api_root + 'api/photos/' + username + '/list';
 
   fetch(tagged_endpoint, tagged_lookupOptions)
     .then(res => {
@@ -124,8 +120,6 @@ export const fetchAllPhotos = username => dispatch => {
 
 // POST / CREATE PHOTO
 export const postPhoto = photoData => (dispatch, getState) => {
-  console.log('POST PHOTO CALLED');
-  console.log('photoData:', photoData);
   const post_lookupOptions = {
     method: 'POST',
     body: photoData,
@@ -142,18 +136,21 @@ export const postPhoto = photoData => (dispatch, getState) => {
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
+      if (res.ok) {
+        res.json().then(photo =>
+          dispatch({
+            type: NEW_PHOTO_SUCCESS,
+            payload: photo,
+          }),
+        );
+      } else {
+        res.json().then(errors =>
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          }),
+        );
       }
-      return res;
     })
-    .then(res => res.json())
-    .then(photo =>
-      dispatch({
-        type: NEW_PHOTO_SUCCESS,
-        payload: photo,
-      }),
-    )
-    .catch(err => console.log('error', err),
-    );
+    .catch(err => console.log('Network Error', err));
 };

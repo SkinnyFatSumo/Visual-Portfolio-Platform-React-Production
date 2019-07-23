@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import AddRelationDefaultPhoto from './AddRelationDefaultPhoto';
 import DeleteButton from './DeleteButton';
 import CreateOrEditPhoto from './CreateOrEditPhoto';
+import Loading from '../support/Loading';
 
 import Carousel from 'react-bootstrap/Carousel';
 import {Button, ButtonGroup, ButtonToolbar, Collapse} from 'react-bootstrap';
@@ -107,75 +108,77 @@ class PhotoGallery extends Component {
       window.innerWidth || 0,
     );
 
-    if (this.props.photos[index] !== undefined) {
-      return (
-        <div className="centering-container">
-          <div className="general-outer-container" id="gallery-page">
-            <div id="outer-carousel">
-              <Carousel
-                activeIndex={index}
-                direction={direction}
-                onSelect={this.handleSelect}
-                controls={true}
-                indicators={width > 450 ? true : false}
-                interval={null}>
-                {this.props.photos.map(photo => (
-                  <Carousel.Item key={photo.id}>
-                    <img
-                      src={photo.thumbnail_source}
-                      href={photo.thumbnail_source}
-                    />
-                    <Carousel.Caption>
-                      <h6 id="carousel-caption">{photo.title}</h6>
-                    </Carousel.Caption>
-                  </Carousel.Item>
-                ))}
-              </Carousel>
+    if (this.props.photos[index] !== undefined && this.props.photos_loaded) {
+      if (this.props.photos.length === 0) {
+        return (
+          <div className="centering-container">
+            <div className="general-outer-container">
+              <h5 id="no-content">Sorry, this user has no photos.</h5>
             </div>
-            <div className="toolbar-container">
-              <ButtonToolbar className="tags-and-photo-toolbar">
-                <Button
-                  onClick={this.launchDetailView}
-                  id={this.props.photos[index].id}>
-                  View Full Res
-                </Button>
-                <CreateOrEditPhoto
-                  action={action}
-                  isOpen={photoActive}
-                  toggleOpen={this.handlePhotoVsTag}
-                  photo={this.props.photos[index]}
-                  disabled={disabled}
-                />
-                {action === 'edit' ? (
-                  <AddRelationDefaultPhoto
-                    isOpen={tagActive}
-                    toggleOpen={this.handlePhotoVsTag}
-                    photo_id={this.props.photos[index].id}
-                  />
-                ) : null}
-                {action === 'edit' ? (
+          </div>
+        );
+      } else {
+        return (
+          <div className="centering-container">
+            <div className="general-outer-container" id="gallery-page">
+              <div id="outer-carousel">
+                <Carousel
+                  activeIndex={index}
+                  direction={direction}
+                  onSelect={this.handleSelect}
+                  controls={true}
+                  indicators={width > 450 ? true : false}
+                  interval={null}>
+                  {this.props.photos.map(photo => (
+                    <Carousel.Item key={photo.id}>
+                      <img
+                        src={photo.thumbnail_source}
+                        href={photo.thumbnail_source}
+                      />
+                      <Carousel.Caption>
+                        <h6 id="carousel-caption">{photo.title}</h6>
+                      </Carousel.Caption>
+                    </Carousel.Item>
+                  ))}
+                </Carousel>
+              </div>
+              <div className="toolbar-container">
+                <ButtonToolbar className="tags-and-photo-toolbar">
                   <Button
-                    onClick={this.deletePhoto}
-                    id={this.props.photos[index].id}
-                    className="danger-button">
-                    Delete Photo
+                    onClick={this.launchDetailView}
+                    id={this.props.photos[index].id}>
+                    View Full Res
                   </Button>
-                ) : null}
-              </ButtonToolbar>
+                  <CreateOrEditPhoto
+                    action={action}
+                    isOpen={photoActive}
+                    toggleOpen={this.handlePhotoVsTag}
+                    photo={this.props.photos[index]}
+                    disabled={disabled}
+                  />
+                  {action === 'edit' ? (
+                    <AddRelationDefaultPhoto
+                      isOpen={tagActive}
+                      toggleOpen={this.handlePhotoVsTag}
+                      photo_id={this.props.photos[index].id}
+                    />
+                  ) : null}
+                  {action === 'edit' ? (
+                    <Button
+                      onClick={this.deletePhoto}
+                      id={this.props.photos[index].id}
+                      className="danger-button">
+                      Delete Photo
+                    </Button>
+                  ) : null}
+                </ButtonToolbar>
+              </div>
             </div>
           </div>
-        </div>
-      );
+        );
+      }
     } else {
-      return (
-        <div className="centering-container">
-          <div className="general-outer-container">
-            <h5 id="no-content">
-              Either this user has no photos, or they failed to load.
-            </h5>
-          </div>
-        </div>
-      );
+      return <Loading />;
     }
   }
 }

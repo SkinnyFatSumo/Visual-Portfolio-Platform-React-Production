@@ -2,24 +2,20 @@ import {
   TAGS_LOADING,
   TAGS_SUCCESS,
   TAGS_FAILURE,
+  GET_ERRORS,
   ALL_TAGS_SUCCESS,
-  
   NEW_TAG_LOADING,
   NEW_TAG_SUCCESS,
   NEW_TAG_FAILURE,
-  
   RELATIONS_LOADING,
   RELATIONS_SUCCESS,
   RELATIONS_FAILURE,
-  
   NEW_RELATION_LOADING,
   NEW_RELATION_SUCCESS,
   NEW_RELATION_FAILURE,
-  
   RUD_RELATION_LOADING,
   RUD_RELATION_SUCCESS,
   RUD_RELATION_FAILURE,
-  
   RUD_TAG_LOADING,
   RUD_TAG_SUCCESS,
   RUD_TAG_FAILURE,
@@ -41,8 +37,7 @@ export const fetchTags = username => dispatch => {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
   };
-  const get_endpoint =
-    api_root + 'api/photos/tags/' + username + '/list';
+  const get_endpoint = api_root + 'api/photos/tags/' + username + '/list';
   fetch(get_endpoint, get_lookupOptions)
     .then(res => res.json())
     .then(tags => {
@@ -106,7 +101,7 @@ export const postRelation = relationData => (dispatch, getState) => {
         payload: relation,
       }),
     )
-    .catch(err => 
+    .catch(err =>
       dispatch({
         type: NEW_RELATION_FAILURE,
         payload: err,
@@ -137,24 +132,33 @@ export const postTag = tagData => (dispatch, getState) => {
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
+      if (res.ok) {
+        res.json().then(tag =>
+          dispatch({
+            type: NEW_TAG_SUCCESS,
+            payload: tag,
+          }),
+        );
+      } else {
+        res.json().then(errors => {
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          });
+          dispatch({
+            type: NEW_TAG_FAILURE,
+            payload: errors,
+          });
+        });
       }
-      return res;
     })
-    .then(res => res.json())
-    .then(tag =>
-      dispatch({
-        type: NEW_TAG_SUCCESS,
-        payload: tag,
-      }),
-    )
-    .catch(err => 
+    .catch(err => {
+      console.log('NETWORK ERROR');
       dispatch({
         type: NEW_TAG_FAILURE,
         payload: err,
-      }),
-    );
+      });
+    });
 };
 
 // Get all relationship identities between photos and tags
@@ -165,8 +169,7 @@ export const fetchRelations = username => dispatch => {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
   };
-  const get_endpoint =
-    api_root + 'api/photos/pwt/' + username + '/list';
+  const get_endpoint = api_root + 'api/photos/pwt/' + username + '/list';
 
   fetch(get_endpoint, get_lookupOptions)
     .then(res => res.json())
@@ -192,8 +195,7 @@ export const rudRelation = (id, method, data) => (dispatch, getState) => {
     },
   };
 
-  const rud_endpoint =
-    api_root + 'api/photos/pwt/rud/' + id.toString();
+  const rud_endpoint = api_root + 'api/photos/pwt/rud/' + id.toString();
 
   const token = getState().auth.token;
   if (token) {
@@ -215,9 +217,11 @@ export const rudRelation = (id, method, data) => (dispatch, getState) => {
     });
 };
 
-
 // Retrieve, Update, Destroy
-export const rudTag = (id, method, username, tags, data) => (dispatch, getState) => {
+export const rudTag = (id, method, username, tags, data) => (
+  dispatch,
+  getState,
+) => {
   dispatch({type: RUD_TAG_LOADING});
 
   console.log('RUD TAG CALLED');
@@ -229,8 +233,7 @@ export const rudTag = (id, method, username, tags, data) => (dispatch, getState)
     },
   };
 
-  const rud_endpoint =
-    api_root + 'api/photos/tags/rud/' + username + '/' + id;
+  const rud_endpoint = api_root + 'api/photos/tags/rud/' + username + '/' + id;
 
   const token = getState().auth.token;
   if (token) {

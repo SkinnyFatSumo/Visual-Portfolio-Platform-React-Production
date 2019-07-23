@@ -33,6 +33,7 @@ class CreateOrEditPhoto extends Component {
         id: photo.id,
       });
     }
+    document.addEventListener('mousedown', this.handleClickOutside);
   }
 
   componentDidUpdate(prevProps) {
@@ -45,6 +46,22 @@ class CreateOrEditPhoto extends Component {
       });
     }
   }
+  
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+  
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.setState({isOpen: false});
+    }
+  };
+
+  toggleOpen = () => {this.setState({isOpen: !this.state.isOpen});}
 
   onTitleChange(e) {
     this.setState({title: e.target.value});
@@ -72,8 +89,8 @@ class CreateOrEditPhoto extends Component {
   }
 
   render() {
-    const {title, photo_source} = this.state;
-    const {action, toggleOpen, isOpen, disabled} = this.props;
+    const {isOpen, photo_source, title} = this.state;
+    const {action, disabled} = this.props;
     var openName;
     var closeName;
     var photo_button_id;
@@ -92,10 +109,10 @@ class CreateOrEditPhoto extends Component {
       closeName = 'Done Adding';
     }
     return (
-      <div>
+      <div ref={this.setWrapperRef}>
         <Button
           id={photo_button_id}
-          onClick={toggleOpen}
+          onClick={this.toggleOpen}
           aria-controls="collapse-photo-box"
           aria-expanded={isOpen}>
           {isOpen ? closeName : openName}
@@ -111,17 +128,16 @@ class CreateOrEditPhoto extends Component {
                       name="title"
                       onChange={this.onTitleChange}
                       placeholder="title"
-                      required
                       type="text"
                       value={title}
                     />
                   </Form.Group>
                   <Form.Group as={Col}>
-                    <Form.Label>Full Resolution URL</Form.Label>
+                    <Form.Label>Photo</Form.Label>
                     <Form.Control
+                      className="photo-upload"
                       name="photo_source"
                       onChange={this.onPhotoChange}
-                      required
                       type="file"
                     />
                   </Form.Group>

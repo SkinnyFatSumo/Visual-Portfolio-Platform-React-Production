@@ -31,7 +31,6 @@ class TagHasPhotos extends Component {
   constructor(props) {
     super(props);
     this.state = {isActive: false, buttonClass: 'button-inactive'};
-
     this.launchDetailView = this.launchDetailView.bind(this);
   }
 

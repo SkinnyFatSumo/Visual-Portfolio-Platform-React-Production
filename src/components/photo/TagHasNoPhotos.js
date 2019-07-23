@@ -21,7 +21,6 @@ class TagHasNoPhotos extends Component {
   };
 
   render() {
-
     var isOpen = this.props.activeTag === this.props.tagname;
     
     if (

@@ -12,6 +12,7 @@ class AddTag extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isOpen: false,
       tagname: '',
     };
 
@@ -46,23 +47,20 @@ class AddTag extends Component {
   };
 
   handleClickOutside = e => {
-    if (
-      this.wrapperRef &&
-      !this.wrapperRef.contains(e.target) &&
-      e.target.id !== 'search-tag-toggle-button'
-    ) {
-      this.props.toggleOpen(e);
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.setState({isOpen: false});
     }
   };
 
+  toggleOpen = () => {this.setState({isOpen: !this.state.isOpen});}
+
   render() {
-    const {isOpen, toggleOpen} = this.props;
-    const {tagname} = this.state;
+    const {isOpen, tagname} = this.state;
     return (
       <div ref={this.setWrapperRef} className="tag-add-box">
         <Button
           id="add-tag-toggle-button"
-          onClick={toggleOpen}
+          onClick={this.toggleOpen}
           aria-controls="collapse-add-tag-box"
           aria-expanded={isOpen}>
           {isOpen ? 'Close' : 'Add Tag'}

@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import store from '../../Store';
 
-import {registerUser} from '../../actions/authActions';
+import {passwordsMatch, registerUser} from '../../actions/authActions';
 import {fetchAllUsers} from '../../actions/userActions';
 
 class Register extends Component {
@@ -27,9 +27,7 @@ class Register extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const {password, password_2, username, email} = this.state;
-    if (password !== password_2) {
-      alert('Error, passwords do not match');
-    } else {
+    if (this.props.passwordsMatch(password, password_2)) {
       var user_data = {
         username: username,
         email: email,
@@ -61,37 +59,13 @@ class Register extends Component {
       last_name,
     } = this.state;
 
-    /*
-    <Form.Row>
-      <Form.Group as={Col}>
-        <Form.Label>First Name</Form.Label>
-        <Form.Control
-          className="form-element-box"
-          type="test"
-          onChange={this.handleChange}
-        />
-        <Form.Text className="text-muted">Optional</Form.Text>
-      </Form.Group>
-
-      <Form.Group as={Col}>
-        <Form.Label>Last Name</Form.Label>
-        <Form.Control
-          className="form-element-box"
-          type="name"
-          onChange={this.handleChange}
-        />
-        <Form.Text className="text-muted">Optional</Form.Text>
-      </Form.Group>
-    </Form.Row>
-    */
     return (
       <div className="centering-container">
         <div className="login-or-register-container">
           <div className="general-outer-container" id="account">
-            <h4>Register</h4>
+            <h4 style={{marginTop: '5px'}}>Register</h4>
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formGroupUsername">
-                <Form.Label>Create a Username</Form.Label>
                 <Form.Control
                   className="form-element-box"
                   type="text"
@@ -100,24 +74,20 @@ class Register extends Component {
                   onChange={this.handleChange}
                   placeholder="username"
                 />
-              </Form.Group>
-              <Form.Group controlId="formGroupEmail">
-                <Form.Label>Email Address</Form.Label>
                 <Form.Control
+                  style={{marginTop: '5px'}}
                   className="form-element-box"
-                  type="email"
+                  type="text"
                   name="email"
                   value={email}
                   placeholder="email"
                   onChange={this.handleChange}
                 />
                 <Form.Text className="text-muted">
-                  We will never email you or share your email address. This is
-                  just for logging in.
+                  We will never send you spam. Promise.
                 </Form.Text>
               </Form.Group>
               <Form.Group controlId="formGroupPassword">
-                <Form.Label>Password</Form.Label>
                 <Form.Control
                   className="form-element-box"
                   name="password"
@@ -127,6 +97,7 @@ class Register extends Component {
                   onChange={this.handleChange}
                 />
                 <Form.Control
+                  style={{marginTop: '5px'}}
                   className="form-element-box"
                   name="password_2"
                   value={password_2}
@@ -136,10 +107,7 @@ class Register extends Component {
                 />
               </Form.Group>
 
-              <Button
-                name="submit"
-                type="submit"
-                id="register-login-button">
+              <Button name="submit" type="submit" id="register-login-button">
                 Submit
               </Button>
             </Form>
@@ -172,6 +140,6 @@ const mapStateToProps = state => ({
 export default withRouter(
   connect(
     mapStateToProps,
-    {registerUser, fetchAllUsers},
+    {passwordsMatch, registerUser, fetchAllUsers},
   )(Register),
 );
