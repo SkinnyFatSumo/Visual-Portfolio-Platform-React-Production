@@ -12,6 +12,7 @@ import {setPhotos, fetchAllPhotos} from '../../actions/photoActions';
 import {fetchRelations, fetchTags, setTags} from '../../actions/tagActions';
 
 // Photo/Tag Components
+import AbsoluteCollapseBox from './AbsoluteCollapseBox';
 import CreateOrEditPhoto from './CreateOrEditPhoto';
 import DisplayButtons from './DisplayButtons';
 import TagSelectBox from './TagSelectBox';
@@ -308,11 +309,13 @@ class ContentRoot extends Component {
                 toggleOpen={this.handlePhotoVsTags}
               />
               {validOwner(this.props) ? (
-                <CreateOrEditPhoto
-                  isOpen={createOrEditPhotoActive}
-                  toggleOpen={this.handlePhotoVsTags}
-                  action="create"
-                />
+                <AbsoluteCollapseBox action="create">
+                  <CreateOrEditPhoto
+                    isOpen={createOrEditPhotoActive}
+                    toggleOpen={this.handlePhotoVsTags}
+                    action="create"
+                  />
+                </AbsoluteCollapseBox>
               ) : null}
             </ButtonToolbar>
           </div>

@@ -5,26 +5,30 @@ import PropTypes from 'prop-types';
 
 class Alerts extends Component {
   static propTypes = {
-    error: PropTypes.object.isRequired,
+    errors: PropTypes.object.isRequired,
   };
 
-  /*
-  componentDidMount() {
-    this.props.alert.show('It works.');
-  }
-  */
-
   componentDidUpdate(prevProps) {
-    const {error, alert} = this.props;
-    if (error !== prevProps.error) {
-      const e = error.errors;
-      if (e.username) e.username.forEach(msg => alert.error('USERNAME: ' + msg));
-      if (e.email) e.email.forEach(msg => alert.error('EMAIL: ' + msg));
-      if (e.title) e.title.forEach(msg => alert.error('TITLE: ' + msg));
-      if (e.tagname) e.tagname.forEach(msg => alert.error('TAG: ' + msg));
-      if (e.password) e.password.forEach(msg => alert.error('PASSWORD: ' + msg));
-      if (e.non_field_errors) e.non_field_errors.forEach(msg => alert.error(msg));
-      if (e.photo_source) e.photo_source.forEach(msg => alert.error('PHOTO: ' + msg));
+    const {errors, alert} = this.props;
+
+    if (errors !== prevProps.errors) {
+      if (errors.server_errors) {
+        const se = errors.server_errors;
+        for (const [key, value] of Object.entries(se)) {
+          if (key === 'non_field_errors') {
+            if (value === 'The fields owner, title must make a unique set.') {
+              alert.error('TITLE: Another photo already has this title.');
+            }
+          }
+          else alert.error(key + ': ' + value);
+        }
+      }
+      if (errors.network_errors) {
+        const ne = errors.network_errors;
+        if (ne.message && ne.message === 'Failed to fetch') {
+          alert.error('NETWORK: Unable to connect to server. Sorry :/');
+        }
+      }
     }
   }
 
@@ -34,7 +38,7 @@ class Alerts extends Component {
 }
 
 const mapStateToProps = state => ({
-  error: state.errors,
+  errors: state.errors,
 });
 
 export default connect(mapStateToProps)(withAlert()(Alerts));

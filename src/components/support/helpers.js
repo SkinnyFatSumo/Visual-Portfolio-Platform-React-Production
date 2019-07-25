@@ -49,6 +49,7 @@ export const tagStringFromURL = path => {
 export const validOwner = props => {
   if (
     props.user !== null &&
+    props.match !== undefined && 
     props.user.username === props.match.params.username &&
     props.isAuthenticated
   )

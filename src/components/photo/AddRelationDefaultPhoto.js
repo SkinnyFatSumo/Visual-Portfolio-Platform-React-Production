@@ -27,31 +27,12 @@ class AddRelationDefaultPhoto extends Component {
       del_tagname: '',
       isOpen: false,
     };
-
     this.onChange = this.onChange.bind(this);
     this.addRelation = this.addRelation.bind(this);
     this.delRelation = this.delRelation.bind(this);
     this.launchTagView = this.launchTagView.bind(this);
     this.filterOutput = this.filterOutput.bind(this);
   }
-
-  componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickOutside);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
-  }
-
-  setWrapperRef = node => {
-    this.wrapperRef = node;
-  };
-
-  handleClickOutside = e => {
-    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
-      this.setState({isOpen: false});
-    }
-  };
 
   onChange(e) {
     this.setState({[e.target.name]: e.target.value});
@@ -118,8 +99,6 @@ class AddRelationDefaultPhoto extends Component {
     );
   }
 
-  toggleOpen = () => {this.setState({isOpen: !this.state.isOpen});}
-
   filterOutput(tag_buttons) {
     if (tag_buttons.length > 0) {
       return tag_buttons;
@@ -165,72 +144,49 @@ class AddRelationDefaultPhoto extends Component {
     );
 
     return (
-      <div ref={this.setWrapperRef} className="relations-box">
-        <Button
-          id="edit-tag-toggle-button"
-          onClick={this.toggleOpen}
-          aria-controls="collapse-photo-box"
-          aria-expanded={isOpen}>
-          {isOpen ? 'Finish' : 'Edit Tags'}
-        </Button>
-        <Collapse in={isOpen}>
-          <div className="absolute-collapse-box">
-            <Form className="photo-or-tag-add-form">
-              {all_tags.length === 0 ? (
-                <Form.Row>
-                  <h5>User has no tags</h5>
+      <Form className="photo-or-tag-add-form">
+        {all_tags.length === 0 ? (
+          <Form.Row>
+            <h5>User has no tags</h5>
+          </Form.Row>
+        ) : (
+          <div>
+            <Form.Label>Associated Tags</Form.Label>
+            <Form.Row>
+              <Form.Group as={Col}>
+                <Form.Control
+                  className="search-box"
+                  autoComplete="off"
+                  type="text"
+                  name="add_tagname"
+                  placeholder="add"
+                  onChange={this.onChange}
+                  required
+                  value={add_tagname}
+                />
+                <Form.Row id="add-tag-row">
+                  {this.filterOutput(unrelated_tag_buttons)}
                 </Form.Row>
-              ) : (
-                <div>
-                  {unrelated_tags.length > 0 ? (
-                    <div>
-                      <Form.Row>
-                        <Form.Group as={Col}>
-                          <Form.Control
-                            className='search-box'
-                            autoComplete="off"
-                            type="text"
-                            name="add_tagname"
-                            placeholder="add"
-                            onChange={this.onChange}
-                            required
-                            value={add_tagname}
-                          />
-                        </Form.Group>
-                      </Form.Row>
-                      <Form.Row id="add-tag-row">
-                        {this.filterOutput(unrelated_tag_buttons)}
-                      </Form.Row>
-                    </div>
-                  ) : null}
-                  {related_tags.length > 0 ? (
-                    <div>
-                      <hr id="edit-tags-horizontal-rule" />
-                      <Form.Row>
-                        <Form.Group as={Col}>
-                          <Form.Control
-                            className='search-box'
-                            autoComplete="off"
-                            type="text"
-                            name="del_tagname"
-                            placeholder="remove"
-                            onChange={this.onChange}
-                            required
-                            value={del_tagname}
-                          />
-                        </Form.Group>
-                      </Form.Row>
-                      <Form.Row id="delete-tag-row">
-                        {this.filterOutput(related_tag_buttons)}
-                      </Form.Row>
-                    </div>
-                  ) : null}
-                </div>
-              )}
-            </Form>
+              </Form.Group>
+              <Form.Group as={Col}>
+                <Form.Control
+                  className="search-box"
+                  autoComplete="off"
+                  type="text"
+                  name="del_tagname"
+                  placeholder="remove"
+                  onChange={this.onChange}
+                  required
+                  value={del_tagname}
+                />
+                <Form.Row id="delete-tag-row">
+                  {this.filterOutput(related_tag_buttons)}
+                </Form.Row>
+              </Form.Group>
+            </Form.Row>
           </div>
-        </Collapse>
-      </div>
+        )}
+      </Form>
     );
   }
 }

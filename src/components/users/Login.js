@@ -1,16 +1,17 @@
 import React, {Component} from 'react';
 import {Router, withRouter, Link, Redirect} from 'react-router-dom';
-import {Button, Form, Collapse, Col} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
 import PropTypes from 'prop-types';
-// import '../../css/users/login.css';
 
 // Redux
 import {connect} from 'react-redux';
 
-// GET Requests for ALL photos/tags
+// Actions
 import {authenticateUser} from '../../actions/authActions'; // async
-
 import {loginUser} from '../../actions/authActions';
+
+// Helpers
+import {validOwner} from '../support/helpers';
 
 class Login extends Component {
   constructor(props) {

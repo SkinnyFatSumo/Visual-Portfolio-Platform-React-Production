@@ -8,17 +8,18 @@ import {connect} from 'react-redux';
 // Actions
 import {rudPhoto, postPhoto} from '../../actions/photoActions';
 
+// Helpers
+import {validOwner} from '../support/helpers';
+
 class CreateOrEditPhoto extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: false,
       title: '',
       photo_source: null,
       owner: '',
       id: '',
     };
-
     this.onPhotoChange = this.onPhotoChange.bind(this);
     this.onTitleChange = this.onTitleChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -33,7 +34,6 @@ class CreateOrEditPhoto extends Component {
         id: photo.id,
       });
     }
-    document.addEventListener('mousedown', this.handleClickOutside);
   }
 
   componentDidUpdate(prevProps) {
@@ -46,22 +46,6 @@ class CreateOrEditPhoto extends Component {
       });
     }
   }
-  
-  componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickOutside);
-  }
-  
-  setWrapperRef = node => {
-    this.wrapperRef = node;
-  };
-
-  handleClickOutside = e => {
-    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
-      this.setState({isOpen: false});
-    }
-  };
-
-  toggleOpen = () => {this.setState({isOpen: !this.state.isOpen});}
 
   onTitleChange(e) {
     this.setState({title: e.target.value});
@@ -71,16 +55,17 @@ class CreateOrEditPhoto extends Component {
     this.setState({
       photo_source: e.target.files[0],
     });
-    console.log(e.target.files[0]);
   }
 
   onSubmit(e) {
     e.preventDefault();
     const {postPhoto, user, action, rudPhoto} = this.props;
+    // form
     var formData = new FormData();
     formData.append('title', this.state.title);
     formData.append('photo_source', this.state.photo_source);
     formData.append('owner', user.id);
+    // post, update, or delete
     if (action === 'create') {
       postPhoto(formData);
     } else if (action === 'edit') {
@@ -89,73 +74,50 @@ class CreateOrEditPhoto extends Component {
   }
 
   render() {
-    const {isOpen, photo_source, title} = this.state;
+    const {photo_source, title} = this.state;
     const {action, disabled} = this.props;
     var openName;
     var closeName;
     var photo_button_id;
 
-    if (action === 'info') {
-      photo_button_id = 'edit-photo-toggle-button';
-      openName = 'Show Details';
-      closeName = 'Hide Details';
-    } else if (action === 'edit') {
-      photo_button_id = 'edit-photo-toggle-button';
-      openName = 'Edit Details';
-      closeName = 'Hide Details';
-    } else if (action === 'create') {
-      photo_button_id = 'add-photo-toggle-button';
-      openName = 'Add Photo';
-      closeName = 'Done Adding';
-    }
     return (
-      <div ref={this.setWrapperRef}>
-        <Button
-          id={photo_button_id}
-          onClick={this.toggleOpen}
-          aria-controls="collapse-photo-box"
-          aria-expanded={isOpen}>
-          {isOpen ? closeName : openName}
-        </Button>
-        <Collapse in={isOpen}>
-          <div className="absolute-collapse-box">
-            <Form className="photo-or-tag-add-form" onSubmit={this.onSubmit}>
-              <fieldset disabled={disabled}>
-                <Form.Row>
-                  <Form.Group as={Col}>
-                    <Form.Label>Title</Form.Label>
-                    <Form.Control
-                      name="title"
-                      onChange={this.onTitleChange}
-                      placeholder="title"
-                      type="text"
-                      value={title}
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Form.Label>Photo</Form.Label>
-                    <Form.Control
-                      className="photo-upload"
-                      name="photo_source"
-                      onChange={this.onPhotoChange}
-                      type="file"
-                    />
-                  </Form.Group>
-                </Form.Row>
-                {action === 'info' ? null : (
-                  <Form.Row id="submit-photo-button-container">
-                    <Form.Group as={Col}>
-                      <Button id="submit-photo-button" type="submit">
-                        Upload Photo
-                      </Button>
-                    </Form.Group>
-                  </Form.Row>
-                )}
-              </fieldset>
-            </Form>
-          </div>
-        </Collapse>
-      </div>
+      <Form className="photo-or-tag-add-form" onSubmit={this.onSubmit}>
+        <fieldset disabled={disabled}>
+          <Form.Row>
+            <Form.Group as={Col}>
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                className="photo-upload"
+                name="title"
+                onChange={this.onTitleChange}
+                placeholder="title"
+                type="text"
+                value={title}
+              />
+            </Form.Group>
+            {validOwner(this.props) ? (
+            <Form.Group as={Col}>
+              <Form.Label>Photo</Form.Label>
+              <Form.Control
+                className="photo-upload"
+                name="photo_source"
+                onChange={this.onPhotoChange}
+                type="file"
+              />
+            </Form.Group>
+            ) : null}
+          </Form.Row>
+          {action === 'info' ? null : (
+            <Form.Row id="submit-photo-button-container">
+              <Form.Group as={Col}>
+                <Button id="submit-photo-button" type="submit">
+                  Upload Photo
+                </Button>
+              </Form.Group>
+            </Form.Row>
+          )}
+        </fieldset>
+      </Form>
     );
   }
 }

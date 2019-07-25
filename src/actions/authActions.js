@@ -3,6 +3,7 @@ import {
   AUTHENTICATION_SUCCESS,
   AUTHENTICATION_FAILURE,
   GET_ERRORS,
+  GET_NETWORK_ERRORS,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
   REGISTER_SUCCESS,
@@ -19,7 +20,7 @@ export const logoutUser = () => (dispatch, getState) => {
   const token = getState().auth.token;
   const auth_endpoint = api_root + 'api/auth/logout';
   const auth_lookupOptions = {
-    method: 'GET',
+    method: 'POST',
     headers: {'Content-Type': 'application/json'},
   };
 
@@ -105,6 +106,7 @@ export const loginUser = userData => dispatch => {
           }),
         );
       } else {
+        console.log('RESPONSE NOT OK');
         response.json().then(errors => {
           console.log('LOGIN ERRORS', errors);
           dispatch({
@@ -117,7 +119,11 @@ export const loginUser = userData => dispatch => {
         });
       }
     })
-    .catch(error => {
+    .catch(errors => {
+      dispatch({
+        type: GET_NETWORK_ERRORS,
+        payload: errors,
+      });
       dispatch({
         type: LOGIN_FAILURE,
       });
@@ -170,10 +176,14 @@ export const registerUser = userData => dispatch => {
         });
       }
     })
-    .catch(error => {
-      console.log('Network Failure', error);
+    .catch(errors => {
+      console.log('Network Failure', errors);
       dispatch({
         type: REGISTER_FAILURE,
+      });
+      dispatch({
+        type: GET_NETWORK_ERRORS,
+        payload: errors,
       });
     });
 };

@@ -14,12 +14,15 @@ import {
 
 import {api_root} from './apiRoot';
 
-// Retrieve, Update, Destroy
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////  RETRIEVE, UPDATE, DESTROY PHOTO  ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const rudPhoto = (id, method, photoData) => (dispatch, getState) => {
   dispatch({type: RUD_PHOTO_LOADING});
 
   console.log('RUD PHOTO CALLED');
-  // TODO: deal with retrieve/update vs destroy headers and return values/statuses
   const rud_lookupOptions = {
     method: method,
     headers: {
@@ -55,7 +58,11 @@ export const rudPhoto = (id, method, photoData) => (dispatch, getState) => {
     });
 };
 
-// Set CURRENT PHOTOS based on tags
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////        SET CURRENT PHOTOS         ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const setPhotos = (username, tag_string) => dispatch => {
   console.log('SET PHOTOS CALLED');
   dispatch({type: PHOTOS_LOADING});
@@ -85,9 +92,12 @@ export const setPhotos = (username, tag_string) => dispatch => {
     );
 };
 
-// GET ALL PHOTOS, DON'T CHANGE CURRENT PHOTOS SET
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////          FETCH ALL PHOTOS         ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const fetchAllPhotos = username => dispatch => {
-  console.log('FETCH ALL PHOTOS CALLED');
   dispatch({type: ALL_PHOTOS_LOADING});
   const tagged_lookupOptions = {
     method: 'GET',
@@ -97,28 +107,41 @@ export const fetchAllPhotos = username => dispatch => {
 
   fetch(tagged_endpoint, tagged_lookupOptions)
     .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
-      }
-      return res;
+      if (res.ok)
+        res.json().then(all_photos =>
+          dispatch({
+            type: ALL_PHOTOS_SUCCESS,
+            payload: all_photos,
+          }),
+        );
+      else
+        res.json().then(errors => {
+          console.log('FETCH PHOTO ERRORS:', errors);
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          });
+          dispatch({
+            type: ALL_PHOTOS_FAILURE,
+          });
+        });
     })
-    .then(res => res.json())
-    .then(all_photos => {
-      console.log('FETCH ALL PHOTOS --SUCCESS--');
+    .catch(errors => {
       dispatch({
-        type: ALL_PHOTOS_SUCCESS,
-        payload: all_photos,
+        type: GET_ERRORS,
+        payload: errors,
       });
-    })
-    .catch(err =>
       dispatch({
         type: ALL_PHOTOS_FAILURE,
-        payload: err.message,
-      }),
-    );
+      });
+    });
 };
 
-// POST / CREATE PHOTO
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////            POST PHOTO             ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const postPhoto = photoData => (dispatch, getState) => {
   const post_lookupOptions = {
     method: 'POST',

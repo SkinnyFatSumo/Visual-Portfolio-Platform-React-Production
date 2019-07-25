@@ -3,6 +3,7 @@ import {
   TAGS_SUCCESS,
   TAGS_FAILURE,
   GET_ERRORS,
+  GET_NETWORK_ERRORS,
   ALL_TAGS_SUCCESS,
   NEW_TAG_LOADING,
   NEW_TAG_SUCCESS,
@@ -109,9 +110,12 @@ export const postRelation = relationData => (dispatch, getState) => {
     );
 };
 
-// POST / CREATE Tag
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////              POST TAG             ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const postTag = tagData => (dispatch, getState) => {
-  console.log('POST TAG CALLED');
   dispatch({
     type: NEW_TAG_LOADING,
   });
@@ -122,13 +126,9 @@ export const postTag = tagData => (dispatch, getState) => {
     headers: {'Content-Type': 'application/json'},
   };
 
-  const token = getState().auth.token;
-  if (token) {
-    post_lookupOptions.headers['Authorization'] = `Token ${token}`;
-  }
-  // TODO: else, dispatch an error
-
   const post_endpoint = api_root + 'api/photos/tags/create';
+  const token = getState().auth.token;
+  if (token) post_lookupOptions.headers['Authorization'] = `Token ${token}`;
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {
@@ -152,16 +152,23 @@ export const postTag = tagData => (dispatch, getState) => {
         });
       }
     })
-    .catch(err => {
-      console.log('NETWORK ERROR');
+    .catch(errors => {
+      dispatch({
+        type: GET_NETWORK_ERRORS,
+        payload: errors,
+      });
       dispatch({
         type: NEW_TAG_FAILURE,
-        payload: err,
+        payload: errors,
       });
     });
 };
 
-// Get all relationship identities between photos and tags
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////          FETCH RELATIONS          ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const fetchRelations = username => dispatch => {
   console.log('FETCH RELATIONS CALLED');
   dispatch({type: RELATIONS_LOADING});

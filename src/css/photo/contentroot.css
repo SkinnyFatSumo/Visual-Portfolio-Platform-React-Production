@@ -54,11 +54,26 @@
 /*=========== COLLAPSIBLE BOXES =============*/
 
 .absolute-collapse-box {
+  margin: auto;
+  width: 536px;
+  text-align: center;
   color: rgba(52, 52, 52, 1);
   position: absolute;
   left: 50%;
   transform: translate(-50%, 0%);
   z-index: 2;
+}
+
+@media only screen and (max-width: 600px) {
+  .absolute-collapse-box {
+    width: 400px;
+  }
+}
+
+@media only screen and (max-width: 420px) {
+  .absolute-collapse-box {
+    width: 200px;
+  }
 }
 
 .collapse-tags-box {
@@ -182,7 +197,7 @@ input[type=file] {
 
 
 .photo-or-tag-add-form {
-  width: 90%;
+  width: 100%;
   display: inline-block;
   text-align: center;
   margin: 2px;
@@ -199,7 +214,8 @@ input[type=file] {
   border-style: solid;
   border-color: rgba(51, 45, 45, 1);
   border-width: 1px;
-  border-radius: 2px;
+  border-radius: 5px;
+  margin: 2px;
 }
 
 #submit-photo-button-container {
@@ -279,6 +295,7 @@ input[type=file] {
 
 /* general add or delete */
 
+
 .add-button {
   background-image: url('../../images/plus-white.svg') !important;
   background-size: 50% !important;
@@ -288,6 +305,10 @@ input[type=file] {
 
 .add-button:hover {
   background-image: url('../../images/plus-black.svg') !important;
+}
+
+.photo-upload {
+  text-align: center
 }
 
 .remove-button {
@@ -336,6 +357,12 @@ input[type=file] {
 
 @media only screen and (max-width: 300px) {
   .display-options-toolbar .btn {
+    width: 100px !important;
+    font-size: 16px !important;
+  }
+  .tags-and-photo-toolbar .btn {
+    width: 100px !important;
+    font-size: 12px !important;
   }
 }
 

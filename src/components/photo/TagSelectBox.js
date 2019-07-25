@@ -90,15 +90,15 @@ class TagSelectBox extends Component {
     });
 
     return (
-      <div ref={this.setWrapperRef} className="collapse-tags-all">
+      <div ref={this.setWrapperRef}>
         <Button
           id="tag-select-box-button"
           onClick={this.toggleOpen}
           aria-controls="collapse-tags-container"
-          aria-expanded={this.props.isOpen}>
-          {this.props.isOpen ? 'Hide Tags' : 'Filter By Tag'}
+          aria-expanded={isOpen}>
+          {isOpen ? 'Hide Tags' : 'Filter By Tag'}
         </Button>
-        <Collapse in={this.state.isOpen}>
+        <Collapse in={isOpen}>
           <div className="absolute-collapse-box">
             <div className="tag-select-container">
               {active.length === 0 ? null : (

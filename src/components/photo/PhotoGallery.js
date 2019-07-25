@@ -4,6 +4,7 @@ import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 // React Components
+import AbsoluteCollapseBox from './AbsoluteCollapseBox';
 import AddRelationDefaultPhoto from './AddRelationDefaultPhoto';
 import DeleteButton from './DeleteButton';
 import CreateOrEditPhoto from './CreateOrEditPhoto';
@@ -26,16 +27,15 @@ class PhotoGallery extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      tagActive: false,
-      photoActive: false,
       index: parseInt(localStorage.getItem('gallery_index'), 10),
       direction: null,
       mapping: null,
       confirm: false,
+      photoOpen: false,
+      tagOpen: false,
     };
-
-    this.handleSelect = this.handleSelect.bind(this);
     this.handlePhotoVsTag = this.handlePhotoVsTag.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
   }
 
   deletePhoto = event => {
@@ -55,21 +55,27 @@ class PhotoGallery extends Component {
     localStorage.setItem('gallery_index', parseInt(selectedIndex, 10));
   };
 
-  handlePhotoVsTag = event => {
-    if (event.target.id === 'edit-photo-toggle-button') {
-      if (this.state.tagActive) {
-        this.setState({tagActive: false});
-      }
-      this.setState({photoActive: !this.state.photoActive});
-    } else if (event.target.id === 'edit-tag-toggle-button') {
-      if (this.state.photoActive) {
-        this.setState({photoActive: false});
-      }
-      this.setState({tagActive: !this.state.tagActive});
-    } else {
-      this.setState({tagActive: false, photoActive: false});
+  // TODO: THIS IS A BUGGY SOLUTION FOR DEALING WITH A REF ISSUE
+  handlePhotoVsTag = e => {
+    if (e.target.id === 'edit-photo-toggle-button' && !this.state.photoOpen) {
+      this.setState({photoOpen: true});
+    } else if (
+      e.target.id === 'edit-tag-toggle-button' &&
+      !this.state.tagOpen
+    ) {
+      this.setState({tagOpen: true});
     }
   };
+
+  togglePhotoOpen = () => {
+    this.setState({photoOpen: !this.state.photoOpen});
+  };
+  toggleTagOpen = () => {
+    this.setState({tagOpen: !this.state.tagOpen});
+  };
+
+  closePhoto = () => this.setState({photoOpen: false});
+  closeTag = () => this.setState({tagOpen: false});
 
   launchDetailView = event => {
     event.preventDefault();
@@ -95,7 +101,7 @@ class PhotoGallery extends Component {
   }
 
   render() {
-    const {index, direction, isOpen, tagActive, photoActive} = this.state;
+    const {index, direction} = this.state;
     var action, disabled;
     if (validOwner(this.props)) action = 'edit';
     else {
@@ -143,26 +149,24 @@ class PhotoGallery extends Component {
                 </Carousel>
               </div>
               <div className="toolbar-container">
-                <ButtonToolbar className="tags-and-photo-toolbar">
+                <ButtonToolbar className="tags-and-photo-toolbar" id="gallery-toolbar">
                   <Button
                     onClick={this.launchDetailView}
                     id={this.props.photos[index].id}>
                     View Full Res
                   </Button>
-                  <CreateOrEditPhoto
-                    action={action}
-                    isOpen={photoActive}
-                    toggleOpen={this.handlePhotoVsTag}
-                    photo={this.props.photos[index]}
-                    disabled={disabled}
-                  />
-                  {action === 'edit' ? (
-                    <AddRelationDefaultPhoto
-                      isOpen={tagActive}
-                      toggleOpen={this.handlePhotoVsTag}
-                      photo_id={this.props.photos[index].id}
+                  <AbsoluteCollapseBox action={action}>
+                    {action === 'edit' ? (
+                      <AddRelationDefaultPhoto
+                        photo_id={this.props.photos[index].id}
+                      />
+                    ) : null}
+                    <CreateOrEditPhoto
+                      action={action}
+                      photo={this.props.photos[index]}
+                      disabled={disabled}
                     />
-                  ) : null}
+                  </AbsoluteCollapseBox>
                   {action === 'edit' ? (
                     <Button
                       onClick={this.deletePhoto}
