@@ -1,6 +1,9 @@
 {
   "name": "portfolio-platform",
   "version": "1.0.0",
+  "engines": {
+    "node": "12.4.0"
+  },
   "description": "Visual Portfolio Platform Application",
   "main": "app.js",
   "scripts": {
