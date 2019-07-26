@@ -9,11 +9,12 @@ import AddTag from './AddTag';
 import FindTagByName from './FindTagByName';
 import TagHasPhotos from './TagHasPhotos';
 import TagHasNoPhotos from './TagHasNoPhotos';
+import Loading from '../support/Loading';
 import {rudRelation, rudTag} from '../../actions/tagActions';
 
 // Helpers
 import PropTypes from 'prop-types';
-import {groupByProperty, validOwner} from '../support/helpers';
+import {groupObjectsByProperty, validOwner} from '../support/helpers';
 
 // React Bootstrap
 import {ButtonToolbar, Form} from 'react-bootstrap';
@@ -28,97 +29,52 @@ import '../../css/photo/taglistall.css';
 class TagListAll extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      addTagActive: false,
-      searchTagActive: false,
-      activeTag: null,
-    };
-
-    this.handleAddVsSearch = this.handleAddVsSearch.bind(this);
-    this.assignData = this.assignData.bind(this);
-    this.setActiveTag = this.setActiveTag.bind(this);
-    this.setActiveTagFromState = this.setActiveTagFromState.bind(this);
-    this.unsetActiveTag = this.unsetActiveTag.bind(this);
-    this.destroyTag = this.destroyTag.bind(this);
+    this.state = {activeTag: null};
   }
 
   componentDidMount() {
-    console.log('STATE', this.props.location.state);
+    let state = this.props.location.state;
     if (
-      this.props.location.state !== undefined &&
-      this.props.location.state.target_tag !== undefined &&
-      this.props.location.state.target_tag !== '' &&
-      this.props.location.state.target_tag !== this.state.activeTag
+      state !== undefined &&
+      state.target_tag !== undefined &&
+      state.target_tag !== '' &&
+      state.target_tag !== this.state.activeTag
     ) {
-      console.log('we got state');
-      this.setActiveTagFromState(this.props.location.state.target_tag);
+      this.setState({activeTag: state.target_tag});
     }
   }
 
-  handleAddVsSearch = event => {
-    if (event.target.id === 'search-tag-toggle-button') {
-      if (this.state.addTagActive) {
-        this.setState({addTagActive: false});
-      }
-      this.setState({searchTagActive: !this.state.searchTagActive});
-    } else if (event.target.id === 'add-tag-toggle-button') {
-      if (this.state.searchTagActive) {
-        this.setState({searchTagActive: false});
-      }
-      this.setState({addTagActive: !this.state.addTagActive});
-    }
+  setActiveTag = e => {
+    e.preventDefault();
+    this.setState({activeTag: e.target.name});
   };
 
-  setActiveTag = event => {
-    event.preventDefault();
-    this.setState({
-      addTagActive: false,
-      searchTagActive: false,
-      activeTag: event.target.name,
-    });
-  };
-
-  setActiveTagFromState = tagname => {
-    this.setState({
-      addTagActive: false,
-      searchTagActive: false,
-      activeTag: tagname,
-    });
-  };
-
-  unsetActiveTag = event => {
-    event.preventDefault();
+  unsetActiveTag = e => {
+    e.preventDefault();
     this.setState({activeTag: null});
   };
 
-  destroyTag = event => {
-    event.preventDefault();
-    this.props.rudTag(
-      event.target.id,
-      'DELETE',
-      this.props.match.params.username,
-    );
+  destroyTag = e => {
+    e.preventDefault();
+    this.props.rudTag(e.target.id, 'DELETE', this.props.match.params.username);
   };
 
   // RESTRUCTURE DATA FOR DISTRIBUTING PHOTOS BASED ON TAGS
   assignData = () => {
-    // CREATE OBJECT TO STORE PHOTOS, USING THEIR IDS AS KEYS
     var photos_object = {};
     this.props.all_photos.forEach(photo => {
       photos_object[photo.id] = photo;
     });
 
-    // GROUP RELATIONS (original format is 1:1, photo to tag) BY TAG
-    const grouped_by_tag = groupByProperty(this.props.relations, 'tag');
-
-    // STORE TAGNAME AND ITS PHOTOS TO ARRAY OF TAGS
-    // STORE THE ACTUAL PHOTO OBJECTS TO THE ARRAY INSTEAD OF THEIR IDS
+    // Group photo objects into new object who's keys are all the different
+    // tags in relations, and who's values are the relations with said tag
+    const grouped_by_tag = groupObjectsByProperty(this.props.relations, 'tag');
     var tag_array_with_photos = [];
     var tag_array_no_photos = this.props.all_tags.slice();
 
     for (const [key, value] of Object.entries(grouped_by_tag)) {
-      // STORE ALL RELATED PHOTOS FOR EACH TAG INTO AN ARRAY BY ACCESSING THE
-      // PHOTOS OBJECT HELD IN STATE USING THE RELATION'S PHOTO_ID KEY
+      // For each key/tag, store its photo objects with their owner id and
+      // relation id
       var related_photos = [];
       value.forEach(relation_photo => {
         related_photos.push({
@@ -128,20 +84,19 @@ class TagListAll extends Component {
         });
       });
 
-      // SORT PHOTOS UNDER TAG BY TITLE NAME (ALPHABETICAL)
-      related_photos.sort((a, b) => {
-        var title_a = a.photo_info.title.toLowerCase();
-        var title_b = b.photo_info.title.toLowerCase();
-        if (title_a < title_b) {
-          return -1;
-        }
-        if (title_a > title_b) {
-          return 1;
-        }
-        return 0;
-      });
+      // Sort the photos alphabetically by title name
+      if (related_photos.length > 1) {
+        related_photos.sort((a, b) => {
+          var title_a = a.photo_info.title.toLowerCase();
+          var title_b = b.photo_info.title.toLowerCase();
+          if (title_a < title_b) return -1;
+          if (title_a > title_b) return 1;
+          return 0;
+        });
+      }
 
-      // APPEND VALUES TO TAG ARRAY
+      // Store the photo info array along with the tagname and tag id into
+      // a new array
       tag_array_with_photos.push({
         tagname: value[0].tagname,
         tag_id: value[0].tag,
@@ -149,29 +104,27 @@ class TagListAll extends Component {
       });
     }
 
-    // CREATE A LIST OF UNUSED TAGS (THOSE WITH NO PHOTOS ASSOCIATED)
+    // Create array of unused tags (ones with no photos associated)
+    //
+    // TODO: THIS ISN'T VERY EFFICIENT: DOUBLE NESTED LOOP
+    //
     for (let i = 0; i < tag_array_with_photos.length; i++) {
       tag_array_no_photos = tag_array_no_photos.filter(
-        all_tags => all_tags.tagname !== tag_array_with_photos[i].tagname,
+        tag => tag.tagname !== tag_array_with_photos[i].tagname,
       );
     }
 
-    // SORT TAG ARRAY BY TAGNAME (ALPHABETICALLY)
+    // Sort alphabetically by tagname
     tag_array_with_photos.sort((a, b) => {
-      var tagname_a = a.tagname.toLowerCase();
-      var tagname_b = b.tagname.toLowerCase();
-      if (tagname_a < tagname_b) {
-        return -1;
-      }
-      if (tagname_a > tagname_b) {
-        return 1;
-      }
+      if (a.tagname.toLowerCase() < b.tagname.toLowerCase()) return -1;
+      if (a.tagname.toLowerCase() > b.tagname.toLowerCase()) return 1;
       return 0;
     });
 
     // CONVERT TO JSX LISTS
     const per_tag_with_photos = tag_array_with_photos.map(tag => (
       <TagHasPhotos
+        activeTag={this.state.activeTag}
         all_photos={this.props.all_photos}
         destroyTag={this.destroyTag}
         id={tag.tagname + '-dropdown'}
@@ -179,28 +132,27 @@ class TagListAll extends Component {
         key={tag.tagname}
         photos={tag.photos}
         relations={this.props.relations}
+        setActiveTag={this.setActiveTag}
         tag_id={tag.tag_id}
         tagname={tag.tagname}
-        user={this.props.user}
-        activeTag={this.state.activeTag}
-        setActiveTag={this.setActiveTag}
         unsetActiveTag={this.unsetActiveTag}
+        user={this.props.user}
       />
     ));
 
     const per_tag_no_photos = tag_array_no_photos.map(tag => (
       <TagHasNoPhotos
+        activeTag={this.state.activeTag}
         all_photos={this.props.all_photos}
         destroyTag={this.destroyTag}
+        isAuthenticated={this.props.isAuthenticated}
         key={tag.tagname}
+        relations={this.props.relations}
+        setActiveTag={this.setActiveTag}
         tag_id={tag.id}
         tagname={tag.tagname}
-        relations={this.props.relations}
-        user={this.props.user}
-        isAuthenticated={this.props.isAuthenticated}
-        activeTag={this.state.activeTag}
-        setActiveTag={this.setActiveTag}
         unsetActiveTag={this.unsetActiveTag}
+        user={this.props.user}
       />
     ));
 
@@ -232,41 +184,40 @@ class TagListAll extends Component {
   };
 
   render() {
-    if (this.props.all_tags_loaded && this.props.all_tags.length > 0 || validOwner(this.props)) {
-      return (
-        <div className="centering-container">
-          <div id="tag-view-content-container" className="content-container">
-            <div className="toolbar-container">
-              <ButtonToolbar className="tags-and-photo-toolbar">
-                {// Only allow a tag to be added if a user is logged in and this
-                // is their content
-                validOwner(this.props) ? (
-                  <AddTag
-                    isOpen={this.state.addTagActive}
-                    toggleOpen={this.handleAddVsSearch}
-                  />
-                ) : null}
-                <FindTagByName
-                  isOpen={this.state.searchTagActive}
-                  toggleOpen={this.handleAddVsSearch}
-                  setActiveTag={this.setActiveTag}
-                />
-              </ButtonToolbar>
-            </div>
-            <div id="all-tags-content-container">
-              <Form id="all-tags-body-form">{this.assignData()}</Form>
+    const {
+      all_photos,
+      all_photos_loaded,
+      all_tags,
+      all_tags_loaded,
+    } = this.props;
+    if (all_photos_loaded && all_tags_loaded) {
+      if (all_tags.length === 0 && !validOwner(this.props)) {
+        return (
+          <div className="centering-container">
+            <div className="general-outer-container">
+              <h5 id="no-content">Sorry, looks like this user has no tags.</h5>
             </div>
           </div>
-        </div>
-      );
+        );
+      } else {
+        return (
+          <div className="centering-container">
+            <div id="tag-view-content-container" className="content-container">
+              <div className="toolbar-container">
+                <ButtonToolbar className="tags-and-photo-toolbar">
+                  {validOwner(this.props) ? <AddTag /> : null}
+                  <FindTagByName setActiveTag={this.setActiveTag} />
+                </ButtonToolbar>
+              </div>
+              <div id="all-tags-content-container">
+                <Form id="all-tags-body-form">{this.assignData()}</Form>
+              </div>
+            </div>
+          </div>
+        );
+      }
     } else {
-      return (
-        <div className="centering-container">
-          <div className="general-outer-container">
-            <h5 id="no-content">Either this user has no tags, or they failed to load.</h5>
-          </div>
-        </div>
-      );
+      return <Loading />;
     }
   }
 }

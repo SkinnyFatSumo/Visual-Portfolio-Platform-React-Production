@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {withRouter} from 'react-router-dom';
 import {Button, Form, Collapse, Col} from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
@@ -8,21 +9,20 @@ import {connect} from 'react-redux';
 // Actions
 import {rudPhoto, postPhoto} from '../../actions/photoActions';
 
+// Helpers
+import {validOwner} from '../support/helpers';
+
 class CreateOrEditPhoto extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: false,
       title: '',
-      photo_source: '',
-      thumbnail_source: '',
-      thumbnail_width: '',
-      thumbnail_height: '',
+      photo_source: null,
       owner: '',
       id: '',
     };
-
-    this.onChange = this.onChange.bind(this);
+    this.onPhotoChange = this.onPhotoChange.bind(this);
+    this.onTitleChange = this.onTitleChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
 
@@ -32,9 +32,6 @@ class CreateOrEditPhoto extends Component {
       this.setState({
         title: photo.title,
         photo_source: photo.photo_source,
-        thumbnail_source: photo.thumbnail_source,
-        thumbnail_width: photo.thumbnail_width,
-        thumbnail_height: photo.thumbnail_height,
         id: photo.id,
       });
     }
@@ -46,156 +43,82 @@ class CreateOrEditPhoto extends Component {
       this.setState({
         title: photo.title,
         photo_source: photo.photo_source,
-        thumbnail_source: photo.thumbnail_source,
-        thumbnail_width: photo.thumbnail_width,
-        thumbnail_height: photo.thumbnail_height,
         id: photo.id,
       });
     }
   }
 
-  onChange(e) {
-    this.setState({[e.target.name]: e.target.value});
+  onTitleChange(e) {
+    this.setState({title: e.target.value});
+  }
+
+  onPhotoChange(e) {
+    this.setState({
+      photo_source: e.target.files[0],
+    });
   }
 
   onSubmit(e) {
     e.preventDefault();
     const {postPhoto, user, action, rudPhoto} = this.props;
-    const photo = {
-      title: this.state.title,
-      photo_source: this.state.photo_source,
-      thumbnail_source: this.state.thumbnail_source,
-      thumbnail_width: this.state.thumbnail_width,
-      thumbnail_height: this.state.thumbnail_height,
-      owner: user.id,
-    };
+    // form
+    var formData = new FormData();
+    formData.append('title', this.state.title);
+    formData.append('photo_source', this.state.photo_source);
+    formData.append('owner', user.id);
+    // post, update, or delete
     if (action === 'create') {
-      postPhoto(photo);
+      postPhoto(formData);
     } else if (action === 'edit') {
-      rudPhoto(this.state.id, 'PUT', photo);
+      rudPhoto(this.state.id, 'PUT', formData);
     }
   }
 
   render() {
-    const {
-      title,
-      photo_source,
-      thumbnail_source,
-      thumbnail_width,
-      thumbnail_height,
-    } = this.state;
-    const {action, toggleOpen, isOpen, disabled} = this.props;
+    const {photo_source, title} = this.state;
+    const {action, disabled} = this.props;
     var openName;
     var closeName;
     var photo_button_id;
 
-    if (action === 'info') {
-      photo_button_id = 'edit-photo-toggle-button';
-      openName = 'Show Details';
-      closeName = 'Hide Details';
-    } else if (action === 'edit') {
-      photo_button_id = 'edit-photo-toggle-button';
-      openName = 'Edit Details';
-      closeName = 'Hide Details';
-    } else if (action === 'create') {
-      photo_button_id = 'add-photo-toggle-button';
-      openName = 'Add Photo';
-      closeName = 'Done Adding';
-    }
     return (
-      <div>
-        <Button
-          id={photo_button_id}
-          onClick={toggleOpen}
-          aria-controls="collapse-photo-box"
-          aria-expanded={isOpen}>
-          {isOpen ? closeName : openName}
-        </Button>
-        <Collapse in={isOpen}>
-          <div className="absolute-collapse-box">
-            <Form className="photo-or-tag-add-form" onSubmit={this.onSubmit}>
-              <fieldset disabled={disabled}>
-                <Form.Row>
-                  <Form.Group as={Col}>
-                    <Form.Label>Title</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="title"
-                      placeholder="an excellent title"
-                      onChange={this.onChange}
-                      required
-                      value={title}
-                    />
-                  </Form.Group>
-                </Form.Row>
-
-                <Form.Row>
-                  <Form.Group as={Col}>
-                    <Form.Label>Full Resolution URL</Form.Label>
-                    <Form.Control
-                      type="url"
-                      name="photo_source"
-                      placeholder="https://www.somehost.com/fullresurl"
-                      onChange={this.onChange}
-                      value={photo_source}
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Form.Label>Thumbnail URL</Form.Label>
-                    <Form.Control
-                      type="url"
-                      name="thumbnail_source"
-                      placeholder="https://www.somehost.com/thumbnailurl"
-                      onChange={this.onChange}
-                      value={thumbnail_source}
-                      required
-                    />
-                  </Form.Group>
-                </Form.Row>
-
-                <Form.Row>
-                  <Form.Group as={Col}>
-                    <Form.Label>Thumbnail Width</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="thumbnail_width"
-                      placeholder="integer"
-                      onChange={this.onChange}
-                      min="0"
-                      step="1"
-                      value={thumbnail_width}
-                      required
-                    />
-                  </Form.Group>
-                  <Form.Group as={Col}>
-                    <Form.Label>Thumbnail Height</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="thumbnail_height"
-                      placeholder="integer"
-                      onChange={this.onChange}
-                      min="0"
-                      step="1"
-                      value={thumbnail_height}
-                      required
-                    />
-                  </Form.Group>
-                </Form.Row>
-                {action === 'info' ? null : (
-                  <Form.Row id="submit-photo-button-container">
-                    <Form.Group as={Col}>
-                      <Button id="submit-photo-button" type="submit">
-                        Upload Photo
-                      </Button>
-                    </Form.Group>
-                  </Form.Row>
-                )}
-              </fieldset>
-            </Form>
-          </div>
-        </Collapse>
-      </div>
+      <Form className="photo-or-tag-add-form" onSubmit={this.onSubmit}>
+        <fieldset disabled={disabled}>
+          <Form.Row>
+            <Form.Group as={Col}>
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                className="photo-upload"
+                name="title"
+                onChange={this.onTitleChange}
+                placeholder="title"
+                type="text"
+                value={title}
+              />
+            </Form.Group>
+            {validOwner(this.props) ? (
+              <Form.Group as={Col}>
+                <Form.Label>Photo</Form.Label>
+                <Form.Control
+                  className="photo-upload"
+                  name="photo_source"
+                  onChange={this.onPhotoChange}
+                  type="file"
+                />
+              </Form.Group>
+            ) : null}
+          </Form.Row>
+          {action === 'info' ? null : (
+            <Form.Row id="submit-photo-button-container">
+              <Form.Group as={Col}>
+                <Button id="submit-photo-button" type="submit">
+                  {action === 'create' ? 'Upload' : 'Update'}
+                </Button>
+              </Form.Group>
+            </Form.Row>
+          )}
+        </fieldset>
+      </Form>
     );
   }
 }
@@ -212,7 +135,9 @@ const mapStateToProps = state => ({
   user: state.auth.user,
 });
 
-export default connect(
-  mapStateToProps,
-  {postPhoto, rudPhoto},
-)(CreateOrEditPhoto);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {postPhoto, rudPhoto},
+  )(CreateOrEditPhoto),
+);

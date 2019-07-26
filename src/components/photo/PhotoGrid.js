@@ -9,6 +9,7 @@ import {fetchRelations, setTags, fetchTags} from '../../actions/tagActions';
 
 // React Components
 import Gallery from 'react-photo-gallery';
+import Loading from '../support/Loading';
 
 // Helpers
 import PropTypes from 'prop-types';
@@ -22,20 +23,31 @@ import {
 //                               PHOTO GRID                                  //
 // ------------------------------------------------------------------------- //
 
-function columns(containerWidth) {
-  let columns = 1;
-  if (containerWidth >= 400) columns = 2;
-  if (containerWidth >= 600) columns = 3;
-  if (containerWidth >= 800) columns = 4;
-  return columns;
-}
-
 class PhotoGrid extends Component {
   constructor(props) {
     super(props);
 
     this.handleClick = this.handleClick.bind(this);
   }
+
+  columns = containerwidth => {
+    let columns = 1;
+    let num_photos = this.props.photos.length;
+
+    if (num_photos === 1) columns = 1;
+    else {
+      // FOR ALL: GIVEN APPROPRIATE WIDTH...
+      // if 2 or more photos, 2 columns
+      if (containerwidth >= 400) columns = 2;
+      // if 6 or more photos, 3 colums
+      if (containerwidth >= 600 && num_photos >= 6) columns = 3;
+      // if 12 or more photos, 4 colums
+      if (containerwidth >= 800 && num_photos >= 12) columns = 4;
+      // if 20 or more photos, 4 columns
+      if (containerwidth >= 1200 && num_photos >= 20) columns = 5;
+    }
+    return columns;
+  };
 
   handleClick = (event, object) => {
     event.preventDefault();
@@ -52,43 +64,39 @@ class PhotoGrid extends Component {
   render() {
     const {photos_loaded, tags_loaded, photos} = this.props;
 
-    if (photos_loaded && tags_loaded && photos.length > 0) {
-      const photo_list = photos.map(photo => ({
-        src: photo.thumbnail_source,
-        width: photo.thumbnail_width,
-        height: photo.thumbnail_height,
-        key: photo.id,
-      }));
-      const photos_length = photos.length;
-      photo_list.forEach(photo => {
-        console.log(
-          'DIMENSIONS: ',
-          photo.src.offsetWidth,
-          photo.src.offsetHeight,
+    if (photos_loaded && tags_loaded) {
+      if (photos.length === 0) {
+        return (
+          <div className="centering-container">
+            <div className="general-outer-container">
+              <h5 id="no-content">Sorry, this user has no photos.</h5>
+            </div>
+          </div>
         );
-      });
-      console.log('photos length:', photos_length);
+      } else {
+        const photo_list = photos.map(photo => ({
+          src: photo.thumbnail_source,
+          width: photo.thumbnail_width,
+          height: photo.thumbnail_height,
+          key: photo.id,
+        }));
+        const photos_length = photos.length;
 
-      return (
-        <div id="grid-border">
-          <div id="grid-container">
-            <Gallery
-              photos={photo_list}
-              direction={photos_length <= 4 ? 'row' : 'column'}
-              columns={columns}
-              onClick={this.handleClick}
-            />
+        return (
+          <div id="grid-border">
+            <div id="grid-container">
+              <Gallery
+                photos={photo_list}
+                direction={photos_length <= 6 ? 'row' : 'column'}
+                columns={this.columns}
+                onClick={this.handleClick}
+              />
+            </div>
           </div>
-        </div>
-      );
+        );
+      }
     } else {
-      return (
-        <div className="centering-container">
-          <div className="general-outer-container">
-            <h5 id="no-content">Either this user has no photos, or they failed to load.</h5>
-          </div>
-        </div>
-      );
+      return <Loading />;
     }
   }
 }

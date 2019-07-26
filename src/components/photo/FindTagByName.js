@@ -17,20 +17,45 @@ class FindTagByName extends Component {
     super(props);
     this.state = {
       tagname: '',
+      isOpen: false,
     };
 
     this.onChange = this.onChange.bind(this);
     this.clearState = this.clearState.bind(this);
   }
 
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.setState({isOpen: false});
+    }
+  };
+
+  toggleOpen = () => {
+    this.setState({isOpen: !this.state.isOpen});
+  };
+
+  preventSubmit = e=> e.preventDefault();
+
   onChange(e) {
     this.setState({[e.target.name]: e.target.value});
   }
 
-  clearState = (e) => {
+  clearState = e => {
     e.preventDefault();
     this.setState({tagname: ''});
-  }
+  };
 
   render() {
     // Get all tags that are in use
@@ -72,17 +97,20 @@ class FindTagByName extends Component {
       ));
 
     return (
-      <div>
+      <div ref={this.setWrapperRef}>
         <Button
           id="search-tag-toggle-button"
-          onClick={this.props.toggleOpen}
+          onClick={this.toggleOpen}
           aria-controls="collapse-search-tag-box"
-          aria-expanded={this.props.isOpen}>
+          aria-expanded={this.state.isOpen}>
           {this.props.isOpen ? 'Close' : 'Go to Tag'}
         </Button>
-        <Collapse in={this.props.isOpen}>
+        <Collapse in={this.state.isOpen}>
           <div className="absolute-collapse-box">
-            <Form className="photo-or-tag-add-form" id="find-tag">
+            <Form
+              onSubmit={this.preventSubmit}
+              className="photo-or-tag-add-form"
+              id="find-tag">
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Control

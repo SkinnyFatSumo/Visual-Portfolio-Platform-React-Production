@@ -1,4 +1,7 @@
 import {
+  ALL_PHOTOS_LOADING,
+  ALL_PHOTOS_FAILURE,
+  ALL_PHOTOS_SUCCESS,
   NEW_PHOTO_LOADING,
   NEW_PHOTO_FAILURE,
   NEW_PHOTO_SUCCESS,
@@ -8,9 +11,7 @@ import {
   RUD_PHOTO_LOADING,
   RUD_PHOTO_FAILURE,
   RUD_PHOTO_SUCCESS,
-  ALL_PHOTOS_LOADING,
-  ALL_PHOTOS_FAILURE,
-  ALL_PHOTOS_SUCCESS,
+
 } from '../actions/types';
 
 const initialState = {
@@ -54,8 +55,8 @@ export default function(state = initialState, action) {
       return {
         ...state,
         photo_detail: action.payload,
-        all_photos_loaded: false,
-        photos_loaded: false,
+        all_photos_loaded: true,
+        photos_loaded: true,
         new_photo_loading: false,
         new_photo_loaded: false,
       };

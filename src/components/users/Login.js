@@ -1,16 +1,17 @@
 import React, {Component} from 'react';
 import {Router, withRouter, Link, Redirect} from 'react-router-dom';
-import {Button, Form, Collapse, Col} from 'react-bootstrap';
+import {Button, Form} from 'react-bootstrap';
 import PropTypes from 'prop-types';
-// import '../../css/users/login.css';
 
 // Redux
 import {connect} from 'react-redux';
 
-// GET Requests for ALL photos/tags
+// Actions
 import {authenticateUser} from '../../actions/authActions'; // async
-
 import {loginUser} from '../../actions/authActions';
+
+// Helpers
+import {validOwner} from '../support/helpers';
 
 class Login extends Component {
   constructor(props) {
@@ -48,35 +49,27 @@ class Login extends Component {
       <div className="centering-container">
         <div className="login-or-register-container">
           <div className="general-outer-container" id="account">
-            <h4>Login</h4>
+            <h4 style={{marginTop: '5px'}}>Login</h4>
             <Form onSubmit={this.handleSubmit}>
               <Form.Group controlId="formGroupEmail">
-                <Form.Label>Email</Form.Label>
                 <Form.Control
-                  autoComplete="off"
                   className="form-element-box"
-                  type="email"
                   name="email"
-                  value={email}
-                  placeholder="Enter Email"
                   onChange={this.handleChange}
+                  placeholder="email"
+                  value={email}
                 />
-              </Form.Group>
-              <Form.Group controlId="formGroupPassword">
-                <Form.Label>Password</Form.Label>
                 <Form.Control
+                  style={{marginTop: '5px'}}
                   className="form-element-box"
                   name="password"
-                  value={password}
-                  type="password"
-                  placeholder="Password"
                   onChange={this.handleChange}
+                  placeholder="password"
+                  type="password"
+                  value={password}
                 />
               </Form.Group>
-              <Button
-                id="register-login-button"
-                name="submit"
-                type="submit">
+              <Button id="register-login-button" name="submit" type="submit">
                 Submit
               </Button>
             </Form>

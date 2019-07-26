@@ -1,19 +1,20 @@
-// Need to use bracket notation for objects because we are using variables
-// that hold strings in order to do our lookups
+// Need to use BRACKET NOTATION for objects because we are using VARIABLES 
+// that hold STRINGS in order to do our lookups
 
-export const groupByProperty = (array, property) => {
-  // create an accumulator, iterate over objects
-  return array.reduce((accumulator, object) => {
-    // create a KEY from the VALUE of the object's designated property
-    var key = object[property];
-    // if the accumulator object doesn't have that property yet
-    // (i.e. it hasn't encountered a designated property instance with that value yet)...
-    if (!accumulator[key]) {
-      // create an accumulator property for it
-      accumulator[key] = [];
-    }
-    // append objects to correct accumulator property
-    accumulator[key].push(object);
+
+// This functions accumulates OBJECTS from an ARRAY OF OBJECTS into an 
+// ACCUMULATER OBJECT based on the VALUES of a DESIGNATED COMMON PROPERTY in 
+// said objects.
+//
+// The VALUE for said property in each of the objects itself becomes a 
+// KEY (PROPERTY) in the ACCUMULATOR OBJECT, and the VALUE of that NEW KEY is 
+// an ARRAY of the OBJECTS who's designated common property had THE SAME VALUE
+
+export const groupObjectsByProperty = (array_of_objects, property) => {
+  return array_of_objects.reduce((accumulator, current_object) => {
+    var key = current_object[property];
+    if (!accumulator[key]) accumulator[key] = [];
+    accumulator[key].push(current_object);
     return accumulator;
   }, {});
 };
@@ -46,8 +47,10 @@ export const tagStringFromURL = path => {
 };
 
 export const validOwner = props => {
+  console.log('valid owner', props);
   if (
     props.user !== null &&
+    props.match !== undefined && 
     props.user.username === props.match.params.username &&
     props.isAuthenticated
   )

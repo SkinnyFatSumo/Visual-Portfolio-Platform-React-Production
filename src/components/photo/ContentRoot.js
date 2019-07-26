@@ -12,6 +12,7 @@ import {setPhotos, fetchAllPhotos} from '../../actions/photoActions';
 import {fetchRelations, fetchTags, setTags} from '../../actions/tagActions';
 
 // Photo/Tag Components
+import AbsoluteCollapseBox from './AbsoluteCollapseBox';
 import CreateOrEditPhoto from './CreateOrEditPhoto';
 import DisplayButtons from './DisplayButtons';
 import TagSelectBox from './TagSelectBox';
@@ -47,7 +48,7 @@ class ContentRoot extends Component {
     this.launchTagsView = this.launchTagsView.bind(this);
     this.handleTagClick = this.handleTagClick.bind(this);
     this.handlePhotoVsTags = this.handlePhotoVsTags.bind(this);
-    */ 
+    */
   }
 
   // ------------------
@@ -105,7 +106,9 @@ class ContentRoot extends Component {
     const {activeDisplay} = this.state;
 
     this.validateDisplay(display, activeDisplay);
+    this.setState({activeDisplay: activeDisplay});
     if (allUsersLoaded) this.initializeUserContent();
+    localStorage.setItem('gallery_index', 0);
   }
 
   // ------------------
@@ -120,6 +123,7 @@ class ContentRoot extends Component {
       all_photos_loaded,
       all_photos_loading,
       allUsersLoaded,
+      photos,
       photos_loaded,
       photos_loading,
       relations_loaded,
@@ -133,6 +137,10 @@ class ContentRoot extends Component {
 
     // INSURE DISPLAY TYPE IS VALID - SET STATE OR REDIRECT
     this.validateDisplay(display, activeDisplay);
+
+    if (display !== 'gallery' && photos.length !== prevProps.photos.length) {
+      localStorage.setItem('gallery_index', 0);
+    }
 
     // INSURE INITIAL LOADING OF USER BEFORE MORE SPECIFIC CHECKS
     if (allUsersLoaded) {
@@ -182,6 +190,8 @@ class ContentRoot extends Component {
         this.setState({createOrEditPhotoActive: false});
       }
       this.setState({viewTagsActive: !this.state.viewTagsActive});
+    } else {
+      this.setState({viewTagsActive: false, createOrEditPhotoActive: false});
     }
   };
 
@@ -246,7 +256,12 @@ class ContentRoot extends Component {
     // STORE DISPLAY TYPE, BECAUSE WE WILL ONLY SHOW TAG SELECT BOX FOR
     // GRID AND GALLERY VIEWS
     const {display} = this.props.match.params;
-    const {createOrEditPhotoActive, isOpen, viewTagsActive} = this.state;
+    const {
+      createOrEditPhotoActive,
+      isOpen,
+      viewTagsActive,
+      activeDisplay,
+    } = this.state;
     const {
       all_photos,
       all_photos_loaded,
@@ -258,8 +273,8 @@ class ContentRoot extends Component {
     } = this.props;
 
     // ONLY ACTIVATE NAVIGATION BUTTONS IF PHOTOS ARE LOADED
-    var active;
-    photos_loaded ? (active = true) : (active = false);
+    var active = true;
+    // photos_loaded ? (active = true) : (active = false);
 
     return (
       <div id="main-toolbars-container">
@@ -269,21 +284,25 @@ class ContentRoot extends Component {
               handleClick={this.launchProfileView}
               name="Profile"
               active={active}
+              id={activeDisplay === 'profile' ? 'active-display' : null}
             />
             <DisplayButtons
               handleClick={this.launchGalleryView}
               name="Gallery"
               active={active}
+              id={activeDisplay === 'gallery' ? 'active-display' : null}
             />
             <DisplayButtons
               handleClick={this.launchGridView}
               name="&nbsp; Grid &nbsp;"
               active={active}
+              id={activeDisplay === 'grid' ? 'active-display' : null}
             />
             <DisplayButtons
               handleClick={this.launchTagsView}
               name="&nbsp; Tags &nbsp;"
               active={active}
+              id={activeDisplay === 'tags' ? 'active-display' : null}
             />
           </ButtonToolbar>
         </div>
@@ -300,11 +319,13 @@ class ContentRoot extends Component {
                 toggleOpen={this.handlePhotoVsTags}
               />
               {validOwner(this.props) ? (
-                <CreateOrEditPhoto
-                  isOpen={createOrEditPhotoActive}
-                  toggleOpen={this.handlePhotoVsTags}
-                  action="create"
-                />
+                <AbsoluteCollapseBox action="create">
+                  <CreateOrEditPhoto
+                    isOpen={createOrEditPhotoActive}
+                    toggleOpen={this.handlePhotoVsTags}
+                    action="create"
+                  />
+                </AbsoluteCollapseBox>
               ) : null}
             </ButtonToolbar>
           </div>

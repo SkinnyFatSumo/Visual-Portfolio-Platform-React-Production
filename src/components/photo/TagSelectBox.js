@@ -13,35 +13,36 @@ class TagSelectBox extends Component {
       isOpen: false,
     };
   }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.setState({isOpen: false});
+    }
+  };
+
+  toggleOpen = () => {
+    this.setState({isOpen: !this.state.isOpen});
+  };
+
   render() {
     // CONTROL TOGGLE STATE OF THE TAG BOX
     const {isOpen} = this.state;
 
     // CREATE LISTS TO STORE ACTIVE VS. INACTIVE TAG BUTTONS
-    var active = [
-      /*
-      <Button
-        key="inactive"
-        className="filter-title"
-        id="active-title"
-        variant="dark"
-        size="sm">
-        ACTIVE: &nbsp; &nbsp;
-      </Button>,
-      */
-    ];
-    var inactive = [
-      /*
-      <Button
-        key="active"
-        className="filter-title"
-        id="inactive-title"
-        variant="secondary"
-        size="sm">
-        INACTIVE:
-      </Button>,
-      */
-    ];
+    var active = [];
+    var inactive = [];
 
     // STORE IDS OF ALL CURRENT PHOTOS BEING DISPLAYED
     const photo_ids = this.props.photos.map(photo => photo.id);
@@ -87,34 +88,39 @@ class TagSelectBox extends Component {
         );
       }
     });
-    // onClick={() => this.setState({isOpen: !isOpen})}
 
     return (
-      <div className="collapse-tags-all">
+      <div ref={this.setWrapperRef}>
         <Button
           id="tag-select-box-button"
-          onClick={this.props.toggleOpen}
+          onClick={this.toggleOpen}
           aria-controls="collapse-tags-container"
-          aria-expanded={this.props.isOpen}>
-          {this.props.isOpen ? 'Hide Tags' : 'Filter By Tag'}
+          aria-expanded={isOpen}>
+          {isOpen ? 'Hide Tags' : 'Filter By Tag'}
         </Button>
-        <Collapse in={this.props.isOpen}>
+        <Collapse in={isOpen}>
           <div className="absolute-collapse-box">
             <div className="tag-select-container">
-              <div className="collapse-tags-box" id="collapse-tags-active">
-                <h6 className="tag-select-header">Active</h6>
-                <ButtonToolbar className="tag-filter-toolbar" id="active-tags">
-                  {active}
-                </ButtonToolbar>
-              </div>
-              <div className="collapse-tags-box" id="collapse-tags-inactive">
-                <h6 className="tag-select-header">Inactive</h6>
-                <ButtonToolbar
-                  className="tag-filter-toolbar"
-                  id="inactive-tags">
-                  {inactive}
-                </ButtonToolbar>
-              </div>
+              {active.length === 0 ? null : (
+                <div className="collapse-tags-box" id="collapse-tags-active">
+                  <h6 className="tag-select-header">Active</h6>
+                  <ButtonToolbar
+                    className="tag-filter-toolbar"
+                    id="active-tags">
+                    {active}
+                  </ButtonToolbar>
+                </div>
+              )}
+              {inactive.length === 0 ? null : (
+                <div className="collapse-tags-box" id="collapse-tags-inactive">
+                  <h6 className="tag-select-header">Inactive</h6>
+                  <ButtonToolbar
+                    className="tag-filter-toolbar"
+                    id="inactive-tags">
+                    {inactive}
+                  </ButtonToolbar>
+                </div>
+              )}
             </div>
           </div>
         </Collapse>

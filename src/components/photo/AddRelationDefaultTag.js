@@ -29,6 +29,7 @@ class AddRelationDefaultTag extends Component {
     this.launchDetailView = this.launchDetailView.bind(this);
     this.filterOutput = this.filterOutput.bind(this);
   }
+  
 
   onChange = e => {
     this.setState({[e.target.name]: e.target.value});

@@ -12,11 +12,20 @@ class AddTag extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isOpen: false,
       tagname: '',
     };
 
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
   }
 
   onChange(e) {
@@ -29,25 +38,39 @@ class AddTag extends Component {
       tagname: this.state.tagname,
       owner: this.props.user.id,
     };
-
     this.props.postTag(tag);
+    this.setState({tagname: ''});
   }
 
+  setWrapperRef = node => {
+    this.wrapperRef = node;
+  };
+
+  handleClickOutside = e => {
+    if (this.wrapperRef && !this.wrapperRef.contains(e.target)) {
+      this.setState({isOpen: false});
+    }
+  };
+
+  toggleOpen = () => {this.setState({isOpen: !this.state.isOpen});}
+
   render() {
-    const {isOpen, toggleOpen} = this.props;
-    const {title} = this.state;
+    const {isOpen, tagname} = this.state;
     return (
-      <div className="tag-add-box">
+      <div ref={this.setWrapperRef} className="tag-add-box">
         <Button
           id="add-tag-toggle-button"
-          onClick={toggleOpen}
+          onClick={this.toggleOpen}
           aria-controls="collapse-add-tag-box"
           aria-expanded={isOpen}>
           {isOpen ? 'Close' : 'Add Tag'}
         </Button>
         <Collapse in={isOpen}>
           <div className="absolute-collapse-box">
-            <Form className="photo-or-tag-add-form" id="add-tag" onSubmit={this.onSubmit}>
+            <Form
+              className="photo-or-tag-add-form"
+              id="add-tag"
+              onSubmit={this.onSubmit}>
               <Form.Control
                 autoComplete="off"
                 type="text"
@@ -55,7 +78,7 @@ class AddTag extends Component {
                 placeholder="sample tag"
                 onChange={this.onChange}
                 required
-                value={title}
+                value={tagname}
               />
               <Button type="submit" block>
                 Create Tag

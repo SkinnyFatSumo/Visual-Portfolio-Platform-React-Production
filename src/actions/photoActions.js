@@ -1,4 +1,9 @@
 import {
+  ALL_PHOTOS_SUCCESS,
+  ALL_PHOTOS_LOADING,
+  ALL_PHOTOS_FAILURE,
+  GET_ERRORS,
+  GET_NETWORK_ERRORS,
   NEW_PHOTO_SUCCESS,
   PHOTOS_SUCCESS,
   PHOTOS_LOADING,
@@ -6,55 +11,55 @@ import {
   RUD_PHOTO_LOADING,
   RUD_PHOTO_FAILURE,
   RUD_PHOTO_SUCCESS,
-  ALL_PHOTOS_SUCCESS,
-  ALL_PHOTOS_LOADING,
-  ALL_PHOTOS_FAILURE,
 } from './types';
 
 import {api_root} from './apiRoot';
 
-// Retrieve, Update, Destroy
-export const rudPhoto = (id, method, data) => (dispatch, getState) => {
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////  RETRIEVE, UPDATE, DESTROY PHOTO  ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+export const rudPhoto = (id, method, photoData) => (dispatch, getState) => {
   dispatch({type: RUD_PHOTO_LOADING});
 
-  console.log('RUD PHOTO CALLED');
-  // TODO: deal with retrieve/update vs destroy headers and return values/statuses
   const rud_lookupOptions = {
     method: method,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {},
   };
-
   const rud_endpoint = api_root + 'api/photos/' + id;
 
   const token = getState().auth.token;
-  if (token) {
-    rud_lookupOptions.headers['Authorization'] = `Token ${token}`;
-  }
-  if (data) {
-    rud_lookupOptions.body = JSON.stringify(data);
-  }
-  // TODO: else, dispatch an error
-  // TODO: catch status code, return alert based on success or failure / type
+  if (token) rud_lookupOptions.headers['Authorization'] = `Token ${token}`;
+  if (photoData) rud_lookupOptions.body = photoData;
 
   fetch(rud_endpoint, rud_lookupOptions)
-    .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
+    .then(response => {
+      if (response.ok) dispatch({type: RUD_PHOTO_SUCCESS});
+      else {
+        response.json().then(errors => {
+          dispatch({
+            type: RUD_PHOTO_FAILURE,
+            payload: errors,
+          });
+        });
       }
-      return res;
     })
-    .then(photo => {
-      dispatch({type: RUD_PHOTO_SUCCESS, payload: photo});
-    })
-    .catch(error => {
-      console.log('error', error);
-      dispatch({type: RUD_PHOTO_FAILURE});
+    .catch(errors => {
+      dispatch({
+        type: RUD_PHOTO_FAILURE,
+      });
+      dispatch({
+        type: GET_NETWORK_ERRORS,
+      });
     });
 };
 
-// Set CURRENT PHOTOS based on tags
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////        SET CURRENT PHOTOS         ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const setPhotos = (username, tag_string) => dispatch => {
   console.log('SET PHOTOS CALLED');
   dispatch({type: PHOTOS_LOADING});
@@ -64,13 +69,9 @@ export const setPhotos = (username, tag_string) => dispatch => {
   };
   var tagged_endpoint;
   tag_string == ''
-    ? (tagged_endpoint =
-        api_root + 'api/photos/' + username + '/list')
+    ? (tagged_endpoint = api_root + 'api/photos/' + username + '/list')
     : (tagged_endpoint =
-        api_root + 'api/photos/' +
-        username +
-        '/sort?tags=' +
-        tag_string);
+        api_root + 'api/photos/' + username + '/sort?tags=' + tag_string);
 
   fetch(tagged_endpoint, tagged_lookupOptions)
     .then(res => res.json())
@@ -88,47 +89,61 @@ export const setPhotos = (username, tag_string) => dispatch => {
     );
 };
 
-// GET ALL PHOTOS, DON'T CHANGE CURRENT PHOTOS SET
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////          FETCH ALL PHOTOS         ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const fetchAllPhotos = username => dispatch => {
-  console.log('FETCH ALL PHOTOS CALLED');
   dispatch({type: ALL_PHOTOS_LOADING});
   const tagged_lookupOptions = {
     method: 'GET',
     headers: {'Content-Type': 'application/json'},
   };
-  const tagged_endpoint =
-    api_root + 'api/photos/' + username + '/list';
+  const tagged_endpoint = api_root + 'api/photos/' + username + '/list';
 
   fetch(tagged_endpoint, tagged_lookupOptions)
     .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
-      }
-      return res;
+      if (res.ok)
+        res.json().then(all_photos =>
+          dispatch({
+            type: ALL_PHOTOS_SUCCESS,
+            payload: all_photos,
+          }),
+        );
+      else
+        res.json().then(errors => {
+          console.log('FETCH PHOTO ERRORS:', errors);
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          });
+          dispatch({
+            type: ALL_PHOTOS_FAILURE,
+          });
+        });
     })
-    .then(res => res.json())
-    .then(all_photos => {
-      console.log('FETCH ALL PHOTOS --SUCCESS--');
+    .catch(errors => {
       dispatch({
-        type: ALL_PHOTOS_SUCCESS,
-        payload: all_photos,
+        type: GET_ERRORS,
+        payload: errors,
       });
-    })
-    .catch(err =>
       dispatch({
         type: ALL_PHOTOS_FAILURE,
-        payload: err.message,
-      }),
-    );
+      });
+    });
 };
 
-// POST / CREATE PHOTO
+///////////////////////////////////////////////////////////////////////////////
+////////////////////                                   ////////////////////////
+////////////////////            POST PHOTO             ////////////////////////
+////////////////////                                   ////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 export const postPhoto = photoData => (dispatch, getState) => {
-  console.log('POST PHOTO CALLED');
   const post_lookupOptions = {
     method: 'POST',
-    body: JSON.stringify(photoData),
-    headers: {'Content-Type': 'application/json'},
+    body: photoData,
+    headers: {},
   };
 
   const token = getState().auth.token;
@@ -141,18 +156,21 @@ export const postPhoto = photoData => (dispatch, getState) => {
 
   fetch(post_endpoint, post_lookupOptions)
     .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
+      if (res.ok) {
+        res.json().then(photo =>
+          dispatch({
+            type: NEW_PHOTO_SUCCESS,
+            payload: photo,
+          }),
+        );
+      } else {
+        res.json().then(errors =>
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          }),
+        );
       }
-      return res;
     })
-    .then(res => res.json())
-    .then(photo =>
-      dispatch({
-        type: NEW_PHOTO_SUCCESS,
-        payload: photo,
-      }),
-    )
-    .catch(err => console.log('error', err),
-    );
+    .catch(err => console.log('Network Error', err));
 };
