@@ -59,7 +59,9 @@ hr {
 }
 
 #go-to-tag-container {
-  margin: 0px 5px 0px 5px;
+  display: inline-block;
+  text-align: center;
+  margin: 0px 5px 0px 12px;
 }
 
 .tagname-button {

@@ -29,8 +29,8 @@ class Register extends Component {
     const {password, password_2, username, email} = this.state;
     if (this.props.passwordsMatch(password, password_2)) {
       var user_data = {
-        username: username,
-        email: email,
+        username: username.toLowerCase(),
+        email: email.toLowerCase(),
         password: password,
       };
       this.props.registerUser(user_data);

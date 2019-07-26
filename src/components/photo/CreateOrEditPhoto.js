@@ -85,7 +85,7 @@ class CreateOrEditPhoto extends Component {
       <Form className="photo-or-tag-add-form" onSubmit={this.onSubmit}>
         <fieldset disabled={disabled}>
           <Form.Row>
-            <Form.Group as={Col}>
+            <Form.Group as={Col} xs={12} sm={6}>
               <Form.Label>Title</Form.Label>
               <Form.Control
                 className="photo-upload"
@@ -97,7 +97,7 @@ class CreateOrEditPhoto extends Component {
               />
             </Form.Group>
             {validOwner(this.props) ? (
-              <Form.Group as={Col}>
+              <Form.Group as={Col} xs={12} sm={6}>
                 <Form.Label>Photo</Form.Label>
                 <Form.Control
                   className="photo-upload"

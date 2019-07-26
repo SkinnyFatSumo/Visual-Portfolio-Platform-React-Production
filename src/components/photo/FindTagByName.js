@@ -115,11 +115,12 @@ class FindTagByName extends Component {
                 <Form.Group as={Col}>
                   <Form.Control
                     autoComplete="off"
-                    type="text"
                     name="tagname"
-                    placeholder="find a tag"
                     onChange={this.onChange}
+                    placeholder="find a tag"
                     required
+                    style={{textAlign: "center"}}
+                    type="text"
                     value={this.state.tagname}
                   />
                 </Form.Group>

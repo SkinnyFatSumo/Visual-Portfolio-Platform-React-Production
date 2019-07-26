@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, ButtonToolbar, Collapse} from 'react-bootstrap';
+import {Button, ButtonToolbar, Col, Collapse, Row} from 'react-bootstrap';
 import {withRouter} from 'react-router-dom';
 import {groupByProperty} from '../support/helpers';
 
@@ -88,6 +88,8 @@ class TagSelectBox extends Component {
         );
       }
     });
+    const a_l = active.length;
+    const i_l = inactive.length;
 
     return (
       <div ref={this.setWrapperRef}>
@@ -101,26 +103,41 @@ class TagSelectBox extends Component {
         <Collapse in={isOpen}>
           <div className="absolute-collapse-box">
             <div className="tag-select-container">
-              {active.length === 0 ? null : (
-                <div className="collapse-tags-box" id="collapse-tags-active">
-                  <h6 className="tag-select-header">Active</h6>
-                  <ButtonToolbar
-                    className="tag-filter-toolbar"
-                    id="active-tags">
-                    {active}
-                  </ButtonToolbar>
-                </div>
-              )}
-              {inactive.length === 0 ? null : (
-                <div className="collapse-tags-box" id="collapse-tags-inactive">
-                  <h6 className="tag-select-header">Inactive</h6>
-                  <ButtonToolbar
-                    className="tag-filter-toolbar"
-                    id="inactive-tags">
-                    {inactive}
-                  </ButtonToolbar>
-                </div>
-              )}
+              <Row>
+                {i_l === 0 && a_l === 0 ? (
+                  <Col>
+                    <h6 style={{textAlign: 'center', marginBottom: "-1px"}}>No Tags to Display</h6>
+                  </Col>
+                ) : null}
+                {i_l === 0 ? null : (
+                  <Col xs={12} sm={a_l === 0 ? 12 : 6}>
+                    <div
+                      className="collapse-tags-box"
+                      id="collapse-tags-inactive">
+                      <h6 className="tag-select-header">Inactive</h6>
+                      <ButtonToolbar
+                        className="tag-filter-toolbar"
+                        id="inactive-tags">
+                        {inactive}
+                      </ButtonToolbar>
+                    </div>
+                  </Col>
+                )}
+                {a_l === 0 ? null : (
+                  <Col xs={12} sm={i_l === 0 ? 12 : 6}>
+                    <div
+                      className="collapse-tags-box"
+                      id="collapse-tags-active">
+                      <h6 className="tag-select-header">Active</h6>
+                      <ButtonToolbar
+                        className="tag-filter-toolbar"
+                        id="active-tags">
+                        {active}
+                      </ButtonToolbar>
+                    </div>
+                  </Col>
+                )}
+              </Row>
             </div>
           </div>
         </Collapse>

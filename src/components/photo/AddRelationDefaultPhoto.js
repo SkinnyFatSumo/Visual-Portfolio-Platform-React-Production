@@ -103,7 +103,7 @@ class AddRelationDefaultPhoto extends Component {
     if (tag_buttons.length > 0) {
       return tag_buttons;
     } else {
-      return <h6>no matches</h6>;
+      return <h6 style={{marginTop: '13px'}}>no matches</h6>;
     }
   }
 

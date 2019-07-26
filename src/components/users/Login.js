@@ -12,6 +12,7 @@ import {loginUser} from '../../actions/authActions';
 
 // Helpers
 import {validOwner} from '../support/helpers';
+import Loading from '../support/Loading';
 
 class Login extends Component {
   constructor(props) {
@@ -28,7 +29,7 @@ class Login extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const user = {
-      email: this.state.email,
+      email: this.state.email.toLowerCase(),
       password: this.state.password,
     };
     console.log('user:', user);
@@ -39,60 +40,68 @@ class Login extends Component {
   handleChange = e => this.setState({[e.target.name]: e.target.value});
 
   render() {
+    const {email, password} = this.state;
+
     if (this.props.isAuthenticated) {
       const user_profile_endpoint =
         '/user/' + this.props.user.username + '/grid/';
       return <Redirect to={user_profile_endpoint} />;
-    }
-    const {email, password} = this.state;
-    return (
-      <div className="centering-container">
-        <div className="login-or-register-container">
-          <div className="general-outer-container" id="account">
-            <h4 style={{marginTop: '5px'}}>Login</h4>
-            <Form onSubmit={this.handleSubmit}>
-              <Form.Group controlId="formGroupEmail">
-                <Form.Control
-                  className="form-element-box"
-                  name="email"
-                  onChange={this.handleChange}
-                  placeholder="email"
-                  value={email}
-                />
-                <Form.Control
-                  style={{marginTop: '5px'}}
-                  className="form-element-box"
-                  name="password"
-                  onChange={this.handleChange}
-                  placeholder="password"
-                  type="password"
-                  value={password}
-                />
-              </Form.Group>
-              <Button id="register-login-button" name="submit" type="submit">
-                Submit
-              </Button>
-            </Form>
-          </div>
-          <div className="general-outer-container" id="register-or-login-link">
-            <Link to="/register" className="nav-link">
-              Don't have an Account? Click here to register.
-            </Link>
+    } else if (this.props.isLoading) {
+      return <Loading />;
+    } else {
+      return (
+        <div className="centering-container">
+          <div className="login-or-register-container">
+            <div className="general-outer-container" id="account">
+              <h4 style={{marginTop: '5px'}}>Login</h4>
+              <Form onSubmit={this.handleSubmit}>
+                <Form.Group controlId="formGroupEmail">
+                  <Form.Control
+                    className="form-element-box"
+                    name="email"
+                    onChange={this.handleChange}
+                    placeholder="email"
+                    value={email}
+                  />
+                  <Form.Control
+                    style={{marginTop: '5px'}}
+                    className="form-element-box"
+                    name="password"
+                    onChange={this.handleChange}
+                    placeholder="password"
+                    type="password"
+                    value={password}
+                  />
+                </Form.Group>
+                <Button id="register-login-button" name="submit" type="submit">
+                  Submit
+                </Button>
+              </Form>
+            </div>
+            <div
+              className="general-outer-container"
+              id="register-or-login-link">
+              <Link to="/register" className="nav-link">
+                Don't have an Account? Click here to register.
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 }
 
 Login.propTypes = {
   loginUser: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool,
+  isLoading: PropTypes.bool,
   user: PropTypes.object,
 };
 
 const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated,
+  isLoading: state.auth.isLoading,
   user: state.auth.user,
 });
 

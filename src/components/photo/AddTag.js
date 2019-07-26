@@ -72,6 +72,7 @@ class AddTag extends Component {
               id="add-tag"
               onSubmit={this.onSubmit}>
               <Form.Control
+                style={{textAlign: "center"}}
                 autoComplete="off"
                 type="text"
                 name="tagname"
