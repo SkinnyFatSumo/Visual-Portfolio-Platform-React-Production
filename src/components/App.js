@@ -46,7 +46,7 @@ const history = createBrowserHistory();
 
 // Alert Options
 const alertOptions = {
-  timeout: 4000,
+  timeout: 3300,
   position: 'top center',
 };
 

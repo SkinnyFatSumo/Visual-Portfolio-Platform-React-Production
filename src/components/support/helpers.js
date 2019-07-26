@@ -47,6 +47,7 @@ export const tagStringFromURL = path => {
 };
 
 export const validOwner = props => {
+  console.log('valid owner', props);
   if (
     props.user !== null &&
     props.match !== undefined && 

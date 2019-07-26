@@ -26,56 +26,32 @@ import '../../css/photo/contentroot.css';
 class PhotoGallery extends Component {
   constructor(props) {
     super(props);
+    let check_index = parseInt(localStorage.getItem('gallery_index'), 10);
+    if (isNaN(check_index)) check_index = 0;
+
     this.state = {
-      index: parseInt(localStorage.getItem('gallery_index'), 10),
+      index: check_index,
       direction: null,
       mapping: null,
-      confirm: false,
       photoOpen: false,
       tagOpen: false,
     };
-    this.handlePhotoVsTag = this.handlePhotoVsTag.bind(this);
+
     this.handleSelect = this.handleSelect.bind(this);
   }
 
   deletePhoto = event => {
     event.preventDefault();
-    console.log('deletePhoto called');
     this.props.rudPhoto(event.target.id, 'DELETE');
   };
 
   handleSelect = (selectedIndex, e) => {
-    console.log('index from handle', this.state.index);
-    console.log('selectedIndex', selectedIndex);
-    console.log('photos', this.props.photos);
     this.setState({
       index: selectedIndex,
       direction: e.direction,
     });
     localStorage.setItem('gallery_index', parseInt(selectedIndex, 10));
   };
-
-  // TODO: THIS IS A BUGGY SOLUTION FOR DEALING WITH A REF ISSUE
-  handlePhotoVsTag = e => {
-    if (e.target.id === 'edit-photo-toggle-button' && !this.state.photoOpen) {
-      this.setState({photoOpen: true});
-    } else if (
-      e.target.id === 'edit-tag-toggle-button' &&
-      !this.state.tagOpen
-    ) {
-      this.setState({tagOpen: true});
-    }
-  };
-
-  togglePhotoOpen = () => {
-    this.setState({photoOpen: !this.state.photoOpen});
-  };
-  toggleTagOpen = () => {
-    this.setState({tagOpen: !this.state.tagOpen});
-  };
-
-  closePhoto = () => this.setState({photoOpen: false});
-  closeTag = () => this.setState({tagOpen: false});
 
   launchDetailView = event => {
     event.preventDefault();
@@ -86,10 +62,6 @@ class PhotoGallery extends Component {
         '/detail/' +
         event.target.id,
     );
-  };
-
-  toggleConfirm = () => {
-    this.setState({confirm: !this.state.confirm});
   };
 
   componentDidUpdate(prevProps) {
@@ -114,7 +86,7 @@ class PhotoGallery extends Component {
       window.innerWidth || 0,
     );
 
-    if (this.props.photos[index] !== undefined && this.props.photos_loaded) {
+    if (this.props.photos_loaded) {
       if (this.props.photos.length === 0) {
         return (
           <div className="centering-container">
@@ -133,7 +105,10 @@ class PhotoGallery extends Component {
                   direction={direction}
                   onSelect={this.handleSelect}
                   controls={true}
-                  indicators={width > 450 ? true : false}
+                  indicators={
+                    false
+                    //indicators={width > 450 ? true : false}
+                  }
                   interval={null}>
                   {this.props.photos.map(photo => (
                     <Carousel.Item key={photo.id}>
@@ -149,14 +124,16 @@ class PhotoGallery extends Component {
                 </Carousel>
               </div>
               <div className="toolbar-container">
-                <ButtonToolbar className="tags-and-photo-toolbar" id="gallery-toolbar">
+                <ButtonToolbar
+                  className="tags-and-photo-toolbar"
+                  id="gallery-toolbar">
                   <Button
                     onClick={this.launchDetailView}
                     id={this.props.photos[index].id}>
-                    View Full Res
+                    View
                   </Button>
                   <AbsoluteCollapseBox action={action}>
-                    {action === 'edit' ? (
+                    {action === 'edit' && this.props.tags.length > 0 ? (
                       <AddRelationDefaultPhoto
                         photo_id={this.props.photos[index].id}
                       />
@@ -172,7 +149,7 @@ class PhotoGallery extends Component {
                       onClick={this.deletePhoto}
                       id={this.props.photos[index].id}
                       className="danger-button">
-                      Delete Photo
+                      Delete
                     </Button>
                   ) : null}
                 </ButtonToolbar>

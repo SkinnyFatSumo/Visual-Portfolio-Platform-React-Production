@@ -48,7 +48,7 @@ class ContentRoot extends Component {
     this.launchTagsView = this.launchTagsView.bind(this);
     this.handleTagClick = this.handleTagClick.bind(this);
     this.handlePhotoVsTags = this.handlePhotoVsTags.bind(this);
-    */ 
+    */
   }
 
   // ------------------
@@ -106,6 +106,7 @@ class ContentRoot extends Component {
     const {activeDisplay} = this.state;
 
     this.validateDisplay(display, activeDisplay);
+    this.setState({activeDisplay: activeDisplay});
     if (allUsersLoaded) this.initializeUserContent();
     localStorage.setItem('gallery_index', 0);
   }
@@ -255,7 +256,12 @@ class ContentRoot extends Component {
     // STORE DISPLAY TYPE, BECAUSE WE WILL ONLY SHOW TAG SELECT BOX FOR
     // GRID AND GALLERY VIEWS
     const {display} = this.props.match.params;
-    const {createOrEditPhotoActive, isOpen, viewTagsActive} = this.state;
+    const {
+      createOrEditPhotoActive,
+      isOpen,
+      viewTagsActive,
+      activeDisplay,
+    } = this.state;
     const {
       all_photos,
       all_photos_loaded,
@@ -278,21 +284,25 @@ class ContentRoot extends Component {
               handleClick={this.launchProfileView}
               name="Profile"
               active={active}
+              id={activeDisplay === 'profile' ? 'active-display' : null}
             />
             <DisplayButtons
               handleClick={this.launchGalleryView}
               name="Gallery"
               active={active}
+              id={activeDisplay === 'gallery' ? 'active-display' : null}
             />
             <DisplayButtons
               handleClick={this.launchGridView}
               name="&nbsp; Grid &nbsp;"
               active={active}
+              id={activeDisplay === 'grid' ? 'active-display' : null}
             />
             <DisplayButtons
               handleClick={this.launchTagsView}
               name="&nbsp; Tags &nbsp;"
               active={active}
+              id={activeDisplay === 'tags' ? 'active-display' : null}
             />
           </ButtonToolbar>
         </div>

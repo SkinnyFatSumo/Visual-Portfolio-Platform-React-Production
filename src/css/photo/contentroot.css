@@ -384,6 +384,11 @@ input[type=file] {
   text-align: center;
 }
 
+#active-display {
+  border-color: rgba(2, 33, 54, 1);
+  background-color: rgba(165, 165, 165, 1);
+}
+
 .display-options-toolbar:hover .btn:hover {
   border-color: rgba(2, 33, 54, 1);
   background-color: rgba(235, 235, 235, 1);

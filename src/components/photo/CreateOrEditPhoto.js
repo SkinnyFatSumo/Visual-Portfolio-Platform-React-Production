@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {withRouter} from 'react-router-dom';
 import {Button, Form, Collapse, Col} from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
@@ -96,22 +97,22 @@ class CreateOrEditPhoto extends Component {
               />
             </Form.Group>
             {validOwner(this.props) ? (
-            <Form.Group as={Col}>
-              <Form.Label>Photo</Form.Label>
-              <Form.Control
-                className="photo-upload"
-                name="photo_source"
-                onChange={this.onPhotoChange}
-                type="file"
-              />
-            </Form.Group>
+              <Form.Group as={Col}>
+                <Form.Label>Photo</Form.Label>
+                <Form.Control
+                  className="photo-upload"
+                  name="photo_source"
+                  onChange={this.onPhotoChange}
+                  type="file"
+                />
+              </Form.Group>
             ) : null}
           </Form.Row>
           {action === 'info' ? null : (
             <Form.Row id="submit-photo-button-container">
               <Form.Group as={Col}>
                 <Button id="submit-photo-button" type="submit">
-                  Upload Photo
+                  {action === 'create' ? 'Upload' : 'Update'}
                 </Button>
               </Form.Group>
             </Form.Row>
@@ -134,7 +135,9 @@ const mapStateToProps = state => ({
   user: state.auth.user,
 });
 
-export default connect(
-  mapStateToProps,
-  {postPhoto, rudPhoto},
-)(CreateOrEditPhoto);
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {postPhoto, rudPhoto},
+  )(CreateOrEditPhoto),
+);

@@ -3,12 +3,15 @@ import {
   AUTHENTICATION_SUCCESS,
   AUTHENTICATION_FAILURE,
   GET_ERRORS,
+  GET_INFO_MESSAGE,
   GET_NETWORK_ERRORS,
+  GET_SUCCESS_MESSAGE,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILURE,
   REGISTER_SUCCESS,
   REGISTER_FAILURE,
-  LOGOUT,
 } from './types';
 
 import {api_root} from './apiRoot';
@@ -17,6 +20,7 @@ console.log('api_root: ', api_root);
 // CHECK TOKEN AND LOAD USER
 
 export const logoutUser = () => (dispatch, getState) => {
+  console.log('LOGOUT THE USER');
   const token = getState().auth.token;
   const auth_endpoint = api_root + 'api/auth/logout';
   const auth_lookupOptions = {
@@ -30,22 +34,23 @@ export const logoutUser = () => (dispatch, getState) => {
 
   fetch(auth_endpoint, auth_lookupOptions)
     .then(response => {
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.ok) {
+        dispatch({
+          type: LOGOUT_SUCCESS,
+          payload: 'Logout Successful',
+        });
+      } else {
+        response.json().then(errors => {
+          dispatch({
+            type: GET_ERRORS,
+            payload: errors,
+          });
+        });
       }
-      return response;
     })
-    .then(
+    .catch(errors => {
       dispatch({
-        type: LOGOUT,
-      }),
-    )
-    .catch(error => {
-      const errors = {
-        message: error,
-      };
-      dispatch({
-        type: GET_ERRORS,
+        type: GET_NETWORK_ERRORS,
         payload: errors,
       });
     });
@@ -111,9 +116,6 @@ export const loginUser = userData => dispatch => {
           console.log('LOGIN ERRORS', errors);
           dispatch({
             type: LOGIN_FAILURE,
-          });
-          dispatch({
-            type: GET_ERRORS,
             payload: errors,
           });
         });
@@ -168,9 +170,6 @@ export const registerUser = userData => dispatch => {
           console.log('Errors:', errors);
           dispatch({
             type: REGISTER_FAILURE,
-          });
-          dispatch({
-            type: GET_ERRORS,
             payload: errors,
           });
         });
@@ -180,6 +179,8 @@ export const registerUser = userData => dispatch => {
       console.log('Network Failure', errors);
       dispatch({
         type: REGISTER_FAILURE,
+        // No payload it's contained in network errors, don't trigger
+        // a regular error alert
       });
       dispatch({
         type: GET_NETWORK_ERRORS,

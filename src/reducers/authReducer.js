@@ -4,9 +4,10 @@ import {
   AUTHENTICATION_FAILURE,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILURE,
   REGISTER_SUCCESS,
   REGISTER_FAILURE,
-  LOGOUT,
 } from '../actions/types';
 
 const initialState = {
@@ -44,8 +45,8 @@ export default function(state = initialState, action) {
     case AUTHENTICATION_FAILURE:
     case REGISTER_FAILURE:
     case LOGIN_FAILURE:
-    case LOGOUT:
-      console.log('authentication failure');
+    case LOGOUT_SUCCESS:
+      console.log('logout success, login failure, reg fail, auth fail');
       localStorage.removeItem('token');
       return {
         ...state,

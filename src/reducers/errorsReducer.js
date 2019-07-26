@@ -1,4 +1,4 @@
-import {GET_ERRORS, GET_NETWORK_ERRORS} from '../actions/types';
+import {GET_ERRORS, GET_NETWORK_ERRORS, LOGIN_FAILURE, RUD_PHOTO_FAILURE} from '../actions/types';
 
 const initialState = {
   server_errors: {},
@@ -8,6 +8,8 @@ const initialState = {
 export default function(state = initialState, action) {
   switch (action.type) {
     case GET_ERRORS:
+    case LOGIN_FAILURE:
+    case RUD_PHOTO_FAILURE:
       return {
         server_errors: action.payload,
       };

@@ -1,5 +1,9 @@
 import {
+  ALL_PHOTOS_SUCCESS,
+  ALL_PHOTOS_LOADING,
+  ALL_PHOTOS_FAILURE,
   GET_ERRORS,
+  GET_NETWORK_ERRORS,
   NEW_PHOTO_SUCCESS,
   PHOTOS_SUCCESS,
   PHOTOS_LOADING,
@@ -7,9 +11,6 @@ import {
   RUD_PHOTO_LOADING,
   RUD_PHOTO_FAILURE,
   RUD_PHOTO_SUCCESS,
-  ALL_PHOTOS_SUCCESS,
-  ALL_PHOTOS_LOADING,
-  ALL_PHOTOS_FAILURE,
 } from './types';
 
 import {api_root} from './apiRoot';
@@ -22,39 +23,35 @@ import {api_root} from './apiRoot';
 export const rudPhoto = (id, method, photoData) => (dispatch, getState) => {
   dispatch({type: RUD_PHOTO_LOADING});
 
-  console.log('RUD PHOTO CALLED');
   const rud_lookupOptions = {
     method: method,
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+    headers: {},
   };
-
   const rud_endpoint = api_root + 'api/photos/' + id;
 
   const token = getState().auth.token;
-  if (token) {
-    rud_lookupOptions.headers['Authorization'] = `Token ${token}`;
-  }
-  if (photoData) {
-    rud_lookupOptions.body = photoData;
-  }
-  // TODO: else, dispatch an error
-  // TODO: catch status code, return alert based on success or failure / type
+  if (token) rud_lookupOptions.headers['Authorization'] = `Token ${token}`;
+  if (photoData) rud_lookupOptions.body = photoData;
 
   fetch(rud_endpoint, rud_lookupOptions)
-    .then(res => {
-      if (!res.ok) {
-        throw Error(res.statusText);
+    .then(response => {
+      if (response.ok) dispatch({type: RUD_PHOTO_SUCCESS});
+      else {
+        response.json().then(errors => {
+          dispatch({
+            type: RUD_PHOTO_FAILURE,
+            payload: errors,
+          });
+        });
       }
-      return res;
     })
-    .then(photo => {
-      dispatch({type: RUD_PHOTO_SUCCESS, payload: photo});
-    })
-    .catch(error => {
-      console.log('error', error);
-      dispatch({type: RUD_PHOTO_FAILURE});
+    .catch(errors => {
+      dispatch({
+        type: RUD_PHOTO_FAILURE,
+      });
+      dispatch({
+        type: GET_NETWORK_ERRORS,
+      });
     });
 };
 
